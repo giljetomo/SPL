@@ -18,6 +18,8 @@
 		52ACA03B267837BE00E1F86A /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA03A267837BE00E1F86A /* Endpoint.swift */; };
 		52ACA03E267837F300E1F86A /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA03D267837F300E1F86A /* Language.swift */; };
 		52ACA04326783CFC00E1F86A /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA04226783CFC00E1F86A /* Word.swift */; };
+		52ACA04C26794A6B00E1F86A /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA04B26794A6B00E1F86A /* AudioPlayer.swift */; };
+		52ACA04F267961C700E1F86A /* Notification+Names.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA04E267961C700E1F86A /* Notification+Names.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		52ACA03A267837BE00E1F86A /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		52ACA03D267837F300E1F86A /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		52ACA04226783CFC00E1F86A /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
+		52ACA04B26794A6B00E1F86A /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
+		52ACA04E267961C700E1F86A /* Notification+Names.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+Names.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +74,7 @@
 				52ACA0182678316400E1F86A /* AppDelegate.swift */,
 				52ACA01A2678316400E1F86A /* SceneDelegate.swift */,
 				52ACA01C2678316400E1F86A /* ViewController.swift */,
+				52ACA04E267961C700E1F86A /* Notification+Names.swift */,
 				52ACA0242678316A00E1F86A /* Assets.xcassets */,
 				52ACA0262678316A00E1F86A /* LaunchScreen.storyboard */,
 				52ACA0292678316A00E1F86A /* Info.plist */,
@@ -84,6 +89,7 @@
 				52ACA04226783CFC00E1F86A /* Word.swift */,
 				52ACA033267832AC00E1F86A /* WordAPI.swift */,
 				52ACA0372678367300E1F86A /* WordInfoAPI.swift */,
+				52ACA04B26794A6B00E1F86A /* AudioPlayer.swift */,
 				52ACA03A267837BE00E1F86A /* Endpoint.swift */,
 				52ACA03D267837F300E1F86A /* Language.swift */,
 			);
@@ -160,12 +166,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				52ACA03B267837BE00E1F86A /* Endpoint.swift in Sources */,
+				52ACA04F267961C700E1F86A /* Notification+Names.swift in Sources */,
 				52ACA01D2678316400E1F86A /* ViewController.swift in Sources */,
 				52ACA04326783CFC00E1F86A /* Word.swift in Sources */,
 				52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */,
 				52ACA0382678367300E1F86A /* WordInfoAPI.swift in Sources */,
 				52ACA034267832AC00E1F86A /* WordAPI.swift in Sources */,
 				52ACA03E267837F300E1F86A /* Language.swift in Sources */,
+				52ACA04C26794A6B00E1F86A /* AudioPlayer.swift in Sources */,
 				52ACA01B2678316400E1F86A /* SceneDelegate.swift in Sources */,
 				52ACA0232678316400E1F86A /* Spelling.xcdatamodeld in Sources */,
 			);
