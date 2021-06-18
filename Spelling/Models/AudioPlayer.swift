@@ -28,8 +28,10 @@ class AudioPlayer {
       try AVAudioSession.sharedInstance().setActive(true,
                                                     options: .notifyOthersOnDeactivation)
       
-      NotificationCenter.default.addObserver(self, selector: #selector(playerEndedPlaying), name: Notification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
-      
+      NotificationCenter.default.addObserver(self,
+                                             selector: #selector(playerEndedPlaying),
+                                             name: Notification.Name.AVPlayerItemDidPlayToEndTime,
+                                             object: nil)
     } catch {
       print(error.localizedDescription)
     }

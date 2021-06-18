@@ -19,7 +19,7 @@ class WordInfoAPI {
   private init() { }
   
   func fetchWordInfoAPI(word: String, country: Country, completion: @escaping (Result<[WordAPI], NetworkError>) -> Void) {
-    guard let url = URL(string: Endpoint.baseUrl + country.rawValue + "/" + word) else { return }
+    guard let url = URL(string: Endpoint.baseURL + country.rawValue + "/" + word) else { return }
     
     let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
       guard error == nil else {

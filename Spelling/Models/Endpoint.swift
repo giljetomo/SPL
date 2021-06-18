@@ -8,5 +8,5 @@
 import Foundation
 
 struct Endpoint {
-  static let baseUrl = "https://api.dictionaryapi.dev/api/v2/entries/"
+  static let baseURL = "https://api.dictionaryapi.dev/api/v2/entries/"
 }
