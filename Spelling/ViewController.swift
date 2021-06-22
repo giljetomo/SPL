@@ -21,7 +21,7 @@ class ViewController: UIViewController {
   var successfulFetch = true
   var partOfSpeech = [String]()
   
-  let words = ["right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  let words = ["opprobrium","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
   var index = 0
   
   let topView: UIView = {
@@ -32,6 +32,13 @@ class ViewController: UIViewController {
   let definitionView: UIView = {
     let v = UIView()
     v.backgroundColor = .lightGray
+    v.translatesAutoresizingMaskIntoConstraints = false
+    return v
+  }()
+  let foregroundView: UIView = {
+    let v = UIView()
+    v.backgroundColor = .black
+    v.alpha = 0
     v.translatesAutoresizingMaskIntoConstraints = false
     return v
   }()
@@ -47,7 +54,7 @@ class ViewController: UIViewController {
     v.backgroundColor = .white
     return v
   }()
-  lazy var dictionVStackView: UIStackView = {
+  lazy var dictionHStackView: UIStackView = {
     let sv = UIStackView(arrangedSubviews: [languageLabel, dictionUS, dictionUK])
     sv.translatesAutoresizingMaskIntoConstraints = false
     sv.axis = .horizontal
@@ -78,16 +85,65 @@ class ViewController: UIViewController {
     lbl.textAlignment = .center
     return lbl
   }()
-  let playButton: UIButton = {
-    let btn = UIButton()
-    btn.setTitle("Play", for: .normal)
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.setTitleColor(.systemBlue, for: .normal)
-    btn.addTarget(self, action: #selector(pressed(_:)), for: .touchUpInside)
-    return btn
+  lazy var playTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(playAudio))
+  let playImageView: UIImageView = {
+    let iv = UIImageView()
+    iv.translatesAutoresizingMaskIntoConstraints = false
+    iv.image = UIImage(named: "audio")
+    iv.contentMode = .scaleAspectFit
+    iv.tintColor = .systemBlue
+    iv.isUserInteractionEnabled = true
+    return iv
   }()
-  
-  
+  var keyboardPosition = CGPoint(x: 0, y: 0)
+  lazy var keyboardPanRecognizer = UIPanGestureRecognizer(target: self, action: #selector(dragKeyboard))
+  lazy var keyboardTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(keyboardTapped))
+  let keyboardView: UIView = {
+    let v = UIView()
+    v.translatesAutoresizingMaskIntoConstraints = false
+    v.heightAnchor.constraint(equalToConstant: 105.0 / UIScreen.main.scale).isActive = true
+    v.clipsToBounds = true
+    v.layer.cornerRadius = 5
+    v.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+    v.backgroundColor = .lightGray
+    v.isUserInteractionEnabled = true
+    return v
+  }()
+  let keyboardImageView: UIImageView = {
+    let iv = UIImageView()
+    iv.translatesAutoresizingMaskIntoConstraints = false
+    iv.contentMode = .scaleAspectFill
+    iv.image = UIImage(named: "keyboard")
+    iv.tintColor = .black
+    iv.isUserInteractionEnabled = true
+    iv.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+    return iv
+  }()
+  lazy var keyboardHStackView: UIStackView = {
+    let sv = UIStackView(arrangedSubviews: [keyboardImageView, keyboardSegmentedControl])
+    sv.translatesAutoresizingMaskIntoConstraints = false
+    sv.axis = .horizontal
+    sv.alignment = .center
+    sv.distribution = .fill
+    sv.spacing = 3
+    return sv
+  }()
+  var keyboardViewIsOpen = true
+  var keyboardViewWidthConstraint: NSLayoutConstraint!
+  var keyboardImageViewTrailingConstraint: NSLayoutConstraint!
+  var keyboardSegmentedControlWidth: CGFloat!
+  var keyboardImageViewWidth: CGFloat!
+  let keyboardSegmentedControl: UISegmentedControl = {
+    let items = ["Keyboard","Shuffled","Cryptic"]
+    let sc = UISegmentedControl(items: items)
+    let font = UIFont.systemFont(ofSize: 16)
+    sc.setTitleTextAttributes([NSAttributedString.Key.font: font], for: .normal)
+    sc.selectedSegmentIndex = 0
+    sc.layer.cornerRadius = 12
+    sc.isHidden = true
+    sc.addTarget(self, action: #selector(keyboardChanged(_:)), for: .valueChanged)
+    return sc
+  }()
   let dictionUS: UIButton = {
     let btn = UIButton()
     btn.setTitle("US", for: .normal)
@@ -134,10 +190,16 @@ class ViewController: UIViewController {
     }
     
     definitionCollectionView.register(DefinitionCollectionViewCell.self, forCellWithReuseIdentifier: DefinitionCollectionViewCell.reuseIdentifier)
-    definitionCollectionView.backgroundColor = .white
+    definitionCollectionView.backgroundColor = UIColor(named: "White")
     setupViewLayout()
     
     NotificationCenter.default.addObserver(self, selector: #selector(changeButtonStatePlayMode), name: .playbackEnded, object: nil)
+  }
+  override func viewDidLayoutSubviews() {
+    if keyboardSegmentedControlWidth == nil { keyboardSegmentedControlWidth = keyboardSegmentedControl.frame.width }
+    if keyboardImageViewWidth == nil || keyboardImageViewWidth == 0.0 {
+      keyboardImageViewWidth = keyboardImageView.frame.width
+    }
   }
   
   private func generateLayout() -> UICollectionViewLayout {
@@ -163,23 +225,10 @@ class ViewController: UIViewController {
   fileprivate func setupViewLayout() {
     view.addSubview(topView)
     view.addSubview(definitionView)
-    view.addSubview(playButton)
+    view.addSubview(playImageView)
     view.addSubview(nextB)
-    
-    topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
-    topView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.95).isActive = true
-    topView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
-    topView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-    
-    definitionView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10).isActive = true
-    definitionView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.90).isActive = true
-    definitionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.30).isActive = true
-    definitionView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-    
-    definitionView.addSubview(definitionCollectionView)
-    definitionCollectionView.translatesAutoresizingMaskIntoConstraints = false
-    definitionCollectionView.widthAnchor.constraint(equalTo: definitionView.widthAnchor, multiplier: 1).isActive = true
-    definitionCollectionView.heightAnchor.constraint(equalTo: definitionView.heightAnchor, multiplier: 1).isActive = true
+    view.addSubview(foregroundView)
+    view.addSubview(keyboardView)
     
     topView.addSubview(dictionView)
     dictionViewWidthConstraint = NSLayoutConstraint(
@@ -192,24 +241,67 @@ class ViewController: UIViewController {
       constant: 0)
     topView.addConstraint(dictionViewWidthConstraint)
     languageLabel.addGestureRecognizer(dictionTapRecognizer)
+    playImageView.addGestureRecognizer(playTapRecognizer)
     
     dictionView.heightAnchor.constraint(equalTo: topView.heightAnchor, multiplier: 0.80).isActive = true
     dictionView.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 8).isActive = true
     dictionView.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
     
-    dictionView.addSubview(dictionVStackView)
-    dictionVStackView.widthAnchor.constraint(equalTo: dictionView.widthAnchor, multiplier: 0.90).isActive = true
-    dictionVStackView.heightAnchor.constraint(equalTo: dictionView.heightAnchor, multiplier: 0.90).isActive = true
-    dictionVStackView.centerYAnchor.constraint(equalTo: dictionView.centerYAnchor).isActive = true
-    dictionVStackView.centerXAnchor.constraint(equalTo: dictionView.centerXAnchor).isActive = true
+    dictionView.addSubview(dictionHStackView)
+    dictionHStackView.widthAnchor.constraint(equalTo: dictionView.widthAnchor, multiplier: 0.90).isActive = true
+    dictionHStackView.heightAnchor.constraint(equalTo: dictionView.heightAnchor, multiplier: 0.90).isActive = true
+    dictionHStackView.centerYAnchor.constraint(equalTo: dictionView.centerYAnchor).isActive = true
+    dictionHStackView.centerXAnchor.constraint(equalTo: dictionView.centerXAnchor).isActive = true
     
     topView.addSubview(levelLabel)
     levelLabel.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -8).isActive = true
     levelLabel.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
     
-    playButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
-    playButton.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor).isActive = true
-    nextB.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: 15).isActive = true
+    topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
+    topView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.95).isActive = true
+    topView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
+    topView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    
+    definitionView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10).isActive = true
+    definitionView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.90).isActive = true
+    definitionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.35).isActive = true
+    definitionView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    
+    definitionView.addSubview(definitionCollectionView)
+    definitionCollectionView.translatesAutoresizingMaskIntoConstraints = false
+    definitionCollectionView.widthAnchor.constraint(equalTo: definitionView.widthAnchor, multiplier: 1).isActive = true
+    definitionCollectionView.heightAnchor.constraint(equalTo: definitionView.heightAnchor, multiplier: 1).isActive = true
+    
+    playImageView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: view.frame.height * 0.05).isActive = true
+    playImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.07).isActive = true
+    playImageView.widthAnchor.constraint(equalTo: playImageView.heightAnchor, multiplier: 1).isActive = true
+    playImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    
+    keyboardViewWidthConstraint = NSLayoutConstraint(
+      item: keyboardView,
+      attribute: .width,
+      relatedBy: .equal,
+      toItem: nil,
+      attribute: .notAnAttribute,
+      multiplier: 1,
+      constant: 105.0 / UIScreen.main.scale)
+    keyboardView.addConstraint(keyboardViewWidthConstraint)
+    
+    foregroundView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 1).isActive = true
+    foregroundView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1).isActive = true
+    foregroundView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    
+    keyboardView.addGestureRecognizer(keyboardTapRecognizer)
+    keyboardView.addGestureRecognizer(keyboardPanRecognizer)
+    keyboardView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    keyboardView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+    
+    keyboardView.addSubview(keyboardHStackView)
+    keyboardHStackView.trailingAnchor.constraint(equalTo: keyboardView.trailingAnchor, constant: -5).isActive = true
+    keyboardHStackView.centerYAnchor.constraint(equalTo: keyboardView.centerYAnchor).isActive = true
+    keyboardHStackView.leadingAnchor.constraint(equalTo: keyboardView.leadingAnchor, constant: 0).isActive = true
+    
+    nextB.topAnchor.constraint(equalTo: playImageView.bottomAnchor, constant: 15).isActive = true
     nextB.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
   }
   
@@ -219,23 +311,81 @@ class ViewController: UIViewController {
     }
   }
   
-  @objc func pressed(_ sender: UIButton) {
-    self.changeButtonStatePlayMode()
+  @objc func keyboardChanged(_ sender: UISegmentedControl) {
+    print(#function)
+    keyboardTapped()
+  }
+  
+  @objc func keyboardTapped() {
+    
+    keyboardViewIsOpen.toggle()
+    
+    let constant =
+      keyboardViewIsOpen
+        ? (keyboardImageViewWidth ?? 0.0)   //105.0 / UIScreen.main.scale
+        : ((keyboardImageViewWidth ?? 0.0) + CGFloat(5.0) + (keyboardSegmentedControlWidth ?? 0.0))
+    keyboardView.removeConstraint(keyboardViewWidthConstraint)
+  
+    UIView.animate(withDuration: 0.40) { [weak self] in
+      self?.foregroundView.alpha = self!.keyboardViewIsOpen ? 0.0 : 0.7
+      self?.keyboardSegmentedControl.isHidden.toggle()
+      self?.keyboardViewWidthConstraint = NSLayoutConstraint(
+        item: self!.keyboardView,
+        attribute: .width,
+        relatedBy: .equal,
+        toItem: nil,
+        attribute: .notAnAttribute,
+        multiplier: 1,
+        constant: constant)
+      self?.keyboardView.addConstraint(self!.keyboardViewWidthConstraint)
+      self?.view.layoutIfNeeded()
+    }
+  }
+  @objc func dragKeyboard(gesture: UIPanGestureRecognizer) {
+    let translation = gesture.translation(in: self.view)
+    if gesture.state == .changed {
+      keyboardView.transform = CGAffineTransform(translationX: 0, y: translation.y + keyboardPosition.y)
+    } else if gesture.state == .ended {
+      keyboardPosition.y += translation.y
+      guard keyboardPosition.y < -20 || keyboardPosition.y > 250 else { return }
+      if keyboardPosition.y < -20 { keyboardPosition.y = -20 }
+      else if keyboardPosition.y > 250 { keyboardPosition.y = 250 }
+      
+      UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseIn, animations: {
+        self.keyboardView.transform = CGAffineTransform(translationX: 0, y: self.keyboardPosition.y)
+      })
+    }
+  }
+  
+  @objc func playAudio() {
+    changeButtonStatePlayMode()
     AudioPlayer.shared.play()
   }
   
   func changeButtonStateAfterFetch(_ successful: Bool) {
-    playButton.isEnabled = successful
-    buttonSetTitleColor()
+    playImageView.isUserInteractionEnabled = successful
+    playImageViewSetColor()
   }
   
   @objc func changeButtonStatePlayMode() {
-    playButton.isEnabled.toggle()
-    buttonSetTitleColor()
+    playImageView.isUserInteractionEnabled.toggle()
+    nextB.isEnabled.toggle()
+    
+    if playImageView.isUserInteractionEnabled {
+      UIView.animate(withDuration: 0.10) {
+        self.playImageViewSetColor()
+        self.playImageView.transform = .identity
+      }
+    } else {
+      UIView.animate(withDuration: 0.50) {
+        self.playImageViewSetColor()
+        self.playImageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+      }
+    }
   }
   
-  fileprivate func buttonSetTitleColor() {
-    playButton.setTitleColor(playButton.isEnabled ? .systemBlue : .gray, for: .normal)
+  fileprivate func playImageViewSetColor() {
+    playImageView.tintColor = playImageView.isUserInteractionEnabled ? .systemBlue : .gray
   }
   
   @objc func fetchNextWord(_ sender: UIButton) {
@@ -289,8 +439,8 @@ class ViewController: UIViewController {
     }
     country.toggle()
     changeLanguage()
-    fetchWordAPI(with: country) { (successful) in
-      self.changeButtonStateAfterFetch(successful)
+    fetchWordAPI(with: country) { [weak self] (successful) in
+      self?.changeButtonStateAfterFetch(successful)
     }
   }
   
@@ -353,51 +503,5 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
     cell.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
     UIView.animate(withDuration: 0.25) { cell.transform = .identity }
-  }
-}
-
-// MARK: - AnimationUtility
-class AnimationUtility: UIViewController, CAAnimationDelegate {
-  
-  static let kSlideAnimationDuration: CFTimeInterval = 0.6
-  
-  static func viewSlideInFromRight(toLeft views: UIView) {
-    var transition: CATransition? = nil
-    transition = CATransition.init()
-    transition?.duration = kSlideAnimationDuration
-    transition?.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    transition?.type = CATransitionType.push
-    transition?.subtype = CATransitionSubtype.fromRight
-    views.layer.add(transition!, forKey: nil)
-  }
-  
-  static func viewSlideInFromLeft(toRight views: UIView) {
-    var transition: CATransition? = nil
-    transition = CATransition.init()
-    transition?.duration = kSlideAnimationDuration
-    transition?.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    transition?.type = CATransitionType.push
-    transition?.subtype = CATransitionSubtype.fromLeft
-    views.layer.add(transition!, forKey: nil)
-  }
-  
-  static func viewSlideInFromTop(toBottom views: UIView) {
-    var transition: CATransition? = nil
-    transition = CATransition.init()
-    transition?.duration = kSlideAnimationDuration
-    transition?.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    transition?.type = CATransitionType.push
-    transition?.subtype = CATransitionSubtype.fromBottom
-    views.layer.add(transition!, forKey: nil)
-  }
-  
-  static func viewSlideInFromBottom(toTop views: UIView) {
-    var transition: CATransition? = nil
-    transition = CATransition.init()
-    transition?.duration = kSlideAnimationDuration
-    transition?.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    transition?.type = CATransitionType.push
-    transition?.subtype = CATransitionSubtype.fromTop
-    views.layer.add(transition!, forKey: nil)
   }
 }
