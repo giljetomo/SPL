@@ -21,7 +21,7 @@ class ViewController: UIViewController {
   var successfulFetch = true
   var partOfSpeech = [String]()
   
-  let words = ["opprobrium","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  let words = ["opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
   var index = 0
   
   let topView: UIView = {
@@ -94,6 +94,30 @@ class ViewController: UIViewController {
     iv.tintColor = .systemBlue
     iv.isUserInteractionEnabled = true
     return iv
+  }()
+  lazy var audioVStackView: UIStackView = {
+    let sv = UIStackView(arrangedSubviews: [playImageView, volumeSlider])
+    sv.translatesAutoresizingMaskIntoConstraints = false
+    sv.axis = .vertical
+    sv.alignment = .center
+    sv.distribution = .fill
+    sv.spacing = 15
+    return sv
+  }()
+  var isAudioMuted = false
+  let volumeSlider: UISlider = {
+    let s = UISlider()
+    s.minimumValue = 0.0
+    s.maximumValue = 1.0
+    s.setValue(0.70, animated: false)
+    s.transform = CGAffineTransform(scaleX: 0.80, y: 0.80)
+    s.widthAnchor.constraint(equalToConstant: 350 / UIScreen.main.scale).isActive = true
+    s.setThumbImage(UIImage(named: "slider"), for: .normal)
+    s.alpha = 0.20
+    s.addTarget(self, action: #selector(changeSlider(_:)), for: .touchDown)
+    s.addTarget(self, action: #selector(adjustVolume(_:)), for: .touchUpInside)
+    s.addTarget(self, action: #selector(adjustVolume(_:)), for: .touchUpOutside)
+    return s
   }()
   var keyboardPosition = CGPoint(x: 0, y: 0)
   lazy var keyboardPanRecognizer = UIPanGestureRecognizer(target: self, action: #selector(dragKeyboard))
@@ -225,7 +249,7 @@ class ViewController: UIViewController {
   fileprivate func setupViewLayout() {
     view.addSubview(topView)
     view.addSubview(definitionView)
-    view.addSubview(playImageView)
+    view.addSubview(audioVStackView)
     view.addSubview(nextB)
     view.addSubview(foregroundView)
     view.addSubview(keyboardView)
@@ -272,10 +296,10 @@ class ViewController: UIViewController {
     definitionCollectionView.widthAnchor.constraint(equalTo: definitionView.widthAnchor, multiplier: 1).isActive = true
     definitionCollectionView.heightAnchor.constraint(equalTo: definitionView.heightAnchor, multiplier: 1).isActive = true
     
-    playImageView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: view.frame.height * 0.05).isActive = true
     playImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.07).isActive = true
     playImageView.widthAnchor.constraint(equalTo: playImageView.heightAnchor, multiplier: 1).isActive = true
-    playImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    audioVStackView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: view.frame.height * 0.05).isActive = true
+    audioVStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     
     keyboardViewWidthConstraint = NSLayoutConstraint(
       item: keyboardView,
@@ -301,7 +325,7 @@ class ViewController: UIViewController {
     keyboardHStackView.centerYAnchor.constraint(equalTo: keyboardView.centerYAnchor).isActive = true
     keyboardHStackView.leadingAnchor.constraint(equalTo: keyboardView.leadingAnchor, constant: 0).isActive = true
     
-    nextB.topAnchor.constraint(equalTo: playImageView.bottomAnchor, constant: 15).isActive = true
+    nextB.topAnchor.constraint(equalTo: audioVStackView.bottomAnchor, constant: 15).isActive = true
     nextB.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
   }
   
@@ -312,7 +336,6 @@ class ViewController: UIViewController {
   }
   
   @objc func keyboardChanged(_ sender: UISegmentedControl) {
-    print(#function)
     keyboardTapped()
   }
   
@@ -362,13 +385,40 @@ class ViewController: UIViewController {
     AudioPlayer.shared.play()
   }
   
+  @objc func adjustVolume(_ sender: UISlider) {
+    sender.alpha = 0.2
+    UIView.animate(withDuration: 0.40) { [weak self] in
+      sender.transform = .identity
+      if sender.value == 0.0 {
+        self?.playImageView.image = UIImage(named: "muted")
+        self?.playImageView.isUserInteractionEnabled = false
+        self?.isAudioMuted = true
+      } else {
+        self?.playImageView.image = UIImage(named: "audio")
+        self?.playImageView.isUserInteractionEnabled = true
+        self?.isAudioMuted = false
+      }
+    }
+    playImageViewSetColor()
+    AudioPlayer.shared.setVolume(to: sender.value)
+  }
+  
+  @objc func changeSlider(_ sender: UISlider) {
+    sender.alpha = 1.0
+    UIView.animate(withDuration: 0.30) {
+      sender.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+    }
+  }
+  
   func changeButtonStateAfterFetch(_ successful: Bool) {
-    playImageView.isUserInteractionEnabled = successful
+    playImageView.isUserInteractionEnabled = successful && !isAudioMuted
+    volumeSlider.isUserInteractionEnabled = successful
     playImageViewSetColor()
   }
   
   @objc func changeButtonStatePlayMode() {
     playImageView.isUserInteractionEnabled.toggle()
+    volumeSlider.isUserInteractionEnabled.toggle()
     nextB.isEnabled.toggle()
     
     if playImageView.isUserInteractionEnabled {
