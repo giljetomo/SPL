@@ -20,7 +20,7 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
     lbl.layer.masksToBounds = true
     lbl.layer.cornerRadius = 5
     lbl.adjustsFontSizeToFitWidth = true
-    lbl.backgroundColor = .lightGray
+//    lbl.backgroundColor = .lightGray
     return lbl
   }()
   
@@ -33,7 +33,7 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
     definitionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
     definitionLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
     contentView.layer.cornerRadius = 5
-    contentView.backgroundColor = .cyan
+//    contentView.backgroundColor = .cyan
   }
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
