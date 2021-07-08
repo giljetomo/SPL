@@ -11,6 +11,7 @@
 		5244D0D4268667FF00BFAF6B /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D3268667FF00BFAF6B /* Keyboard.swift */; };
 		5244D0D826866D3000BFAF6B /* UIButton+HighlightedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */; };
 		5244D0D926866D3000BFAF6B /* KeyboardCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */; };
+		524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */; };
 		52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA0182678316400E1F86A /* AppDelegate.swift */; };
 		52ACA01B2678316400E1F86A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA01A2678316400E1F86A /* SceneDelegate.swift */; };
 		52ACA01D2678316400E1F86A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA01C2678316400E1F86A /* ViewController.swift */; };
@@ -35,6 +36,7 @@
 		5244D0D3268667FF00BFAF6B /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 		5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+HighlightedButton.swift"; sourceTree = "<group>"; };
 		5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardCollectionViewCell.swift; sourceTree = "<group>"; };
+		524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCollectionViewCell.swift; sourceTree = "<group>"; };
 		52ACA0152678316400E1F86A /* Spelling.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spelling.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52ACA0182678316400E1F86A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52ACA01A2678316400E1F86A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 				5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */,
 				5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */,
 				52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */,
+				524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */,
 				52ACA068267D213D00E1F86A /* Utils */,
 				52ACA0292678316A00E1F86A /* Info.plist */,
 			);
@@ -211,6 +214,7 @@
 				52ACA01D2678316400E1F86A /* ViewController.swift in Sources */,
 				52ACA04326783CFC00E1F86A /* Word.swift in Sources */,
 				5244D0CC2682650400BFAF6B /* AnimationUtility.swift in Sources */,
+				524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */,
 				5244D0D826866D3000BFAF6B /* UIButton+HighlightedButton.swift in Sources */,
 				52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */,
 				52ACA0382678367300E1F86A /* WordInfoAPI.swift in Sources */,

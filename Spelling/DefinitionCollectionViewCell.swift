@@ -27,7 +27,7 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     contentView.addSubview(definitionLabel)
-//    //constraints need to be applied so the button does not overflow outside the contentView
+//  constraints need to be applied so the button does not overflow outside the contentView
     definitionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5).isActive = true
     definitionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5).isActive = true
     definitionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
