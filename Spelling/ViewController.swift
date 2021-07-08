@@ -6,23 +6,33 @@
 //
 
 import UIKit
+import Foundation
+import AVFoundation
 
 class ViewController: UIViewController {
-
+  
   var keyboardOption: KeyboardOption = .keyboard
+  var shuffledWord = [[String]](repeating: [String](), count: 3)
+  var concealedWord = [[String]](repeating: [String](), count: 3)
   var word: Word? {
     didSet {
-      guard let word = self.word else { return }
+      guard let word = self.word else {
+        shuffledWord = [[String]](repeating: [String](), count: 3)
+        concealedWord = [[String]](repeating: [String](), count: 3)
+        return
+      }
       for (partOfSpeech, _) in word.definition {
         self.partOfSpeech.append(partOfSpeech)
       }
+      shuffledWord = Keyboard.getShuffledWord(for: word.word)
+      concealedWord = Keyboard.getConcealedWord(word: word.word)
     }
   }
   var country: Country = .US
   var successfulFetch = true
   var partOfSpeech = [String]()
   
-  let words = ["expugnable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behaviour","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  let words = ["wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
   var index = 0
   
   let topView: UIView = {
@@ -166,7 +176,7 @@ class ViewController: UIViewController {
   var keyboardSegmentedControlWidth: CGFloat!
   var keyboardImageViewWidth: CGFloat!
   let keyboardSegmentedControl: UISegmentedControl = {
-    let items = ["Keyboard","Shuffled","Cryptic"]
+    let items = ["Keyboard","Shuffled","Concealed"]
     let sc = UISegmentedControl(items: items)
     let font = UIFont.systemFont(ofSize: 16)
     sc.setTitleTextAttributes([NSAttributedString.Key.font: font], for: .normal)
@@ -197,7 +207,20 @@ class ViewController: UIViewController {
     btn.addTarget(self, action: #selector(changeDiction(_:)), for: .touchUpInside)
     return btn
   }()
-  
+  let guessLabelView: UIView = {
+    let v = UIView()
+    v.translatesAutoresizingMaskIntoConstraints = false
+    return v
+  }()
+  let guessLabel: UILabel = {
+    let lbl = UILabel()
+    lbl.translatesAutoresizingMaskIntoConstraints = false
+    lbl.text = ""
+    lbl.font = UIFont.preferredFont(forTextStyle: .largeTitle)
+    lbl.adjustsFontForContentSizeCategory = true
+    lbl.textAlignment = .center
+    return lbl
+  }()
   let nextB: UIButton = {
     let btn = UIButton()
     btn.setTitle("Next", for: .normal)
@@ -264,7 +287,7 @@ class ViewController: UIViewController {
   }
   
   private func generateKeyboardLayout() -> UICollectionViewLayout {
-
+    
     let groupInset = 3 / UIScreen.main.scale
     let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
       let item = NSCollectionLayoutItem(
@@ -280,8 +303,15 @@ class ViewController: UIViewController {
       group.contentInsets = NSDirectionalEdgeInsets(top: groupInset, leading: groupInset, bottom: groupInset, trailing: groupInset)
       
       var inset: CGFloat = .zero
+      var count = 0
       if let keyboardSection = KeyboardSection(rawValue: sectionIndex) {
-        let count = Keyboard.getItems(at: keyboardSection).count
+        if self.keyboardOption == .keyboard {
+          count = Keyboard.getKeyboardItems(at: keyboardSection).count
+        } else if self.keyboardOption == .shuffled {
+          count = self.shuffledWord[sectionIndex].count
+        } else if self.keyboardOption == .concealed {
+          count = self.concealedWord[sectionIndex].count
+        }
         let containerWidth = layoutEnvironment.container.contentSize.width
         let groupWidthDimension = group.layoutSize.widthDimension.dimension
         let itemWidth = containerWidth * groupWidthDimension
@@ -299,6 +329,7 @@ class ViewController: UIViewController {
     view.addSubview(topView)
     view.addSubview(definitionView)
     view.addSubview(audioVStackView)
+    view.addSubview(guessLabelView)
     view.addSubview(nextB)
     view.addSubview(keyboardSectionView)
     view.addSubview(foregroundView)
@@ -338,7 +369,7 @@ class ViewController: UIViewController {
     
     definitionView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10).isActive = true
     definitionView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.90).isActive = true
-    definitionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.35).isActive = true
+    definitionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.30).isActive = true
     definitionView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     
     definitionView.addSubview(definitionCollectionView)
@@ -348,10 +379,19 @@ class ViewController: UIViewController {
     
     audioImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.07).isActive = true
     audioImageView.widthAnchor.constraint(equalTo: audioImageView.heightAnchor, multiplier: 1).isActive = true
-    audioVStackView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: view.frame.height * 0.05).isActive = true
+    audioVStackView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: view.frame.height * 0.02).isActive = true
     audioVStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     
-    keyboardSectionView.topAnchor.constraint(equalTo: audioVStackView.bottomAnchor, constant: 10).isActive = true
+    guessLabelView.topAnchor.constraint(equalTo: audioVStackView.bottomAnchor, constant: 0).isActive = true
+    guessLabelView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.08).isActive = true
+    guessLabelView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 1).isActive = true
+    guessLabelView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    
+    guessLabelView.addSubview(guessLabel)
+    guessLabel.centerXAnchor.constraint(equalTo: guessLabelView.centerXAnchor).isActive = true
+    guessLabel.centerYAnchor.constraint(equalTo: guessLabelView.centerYAnchor).isActive = true
+    
+    keyboardSectionView.topAnchor.constraint(equalTo: guessLabelView.bottomAnchor, constant: 10).isActive = true
     keyboardSectionView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.95).isActive = true
     keyboardSectionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.20).isActive = true
     keyboardSectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -385,7 +425,7 @@ class ViewController: UIViewController {
     keyboardHStackView.centerYAnchor.constraint(equalTo: keyboardView.centerYAnchor).isActive = true
     keyboardHStackView.leadingAnchor.constraint(equalTo: keyboardView.leadingAnchor, constant: 0).isActive = true
     
-    nextB.topAnchor.constraint(equalTo: keyboardSectionView.bottomAnchor, constant: 15).isActive = true
+    nextB.topAnchor.constraint(equalTo: keyboardSectionView.bottomAnchor, constant: 20).isActive = true
     nextB.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
   }
   
@@ -397,7 +437,14 @@ class ViewController: UIViewController {
   
   @objc func keyboardChanged(_ sender: UISegmentedControl) {
     keyboardTapped()
+    
+    guard let option = KeyboardOption(rawValue: sender.selectedSegmentIndex) else { return }
+    keyboardOption = option
+    UIView.animate(withDuration: 0.5) {
+      self.keyboardCollectionView.reloadData()
+    }
   }
+  
   
   @objc func keyboardTapped() {
     
@@ -405,10 +452,10 @@ class ViewController: UIViewController {
     
     let constant =
       keyboardViewIsOpen
-        ? (keyboardImageViewWidth ?? 0.0)   //105.0 / UIScreen.main.scale
-        : ((keyboardImageViewWidth ?? 0.0) + CGFloat(5.0) + (keyboardSegmentedControlWidth ?? 0.0))
+      ? (keyboardImageViewWidth ?? 0.0)   //105.0 / UIScreen.main.scale
+      : ((keyboardImageViewWidth ?? 0.0) + CGFloat(5.0) + (keyboardSegmentedControlWidth ?? 0.0))
     keyboardView.removeConstraint(keyboardViewWidthConstraint)
-  
+    
     UIView.animate(withDuration: 0.40) { [weak self] in
       self?.foregroundView.alpha = self!.keyboardViewIsOpen ? 0.0 : 0.7
       self?.keyboardSegmentedControl.isHidden.toggle()
@@ -510,6 +557,7 @@ class ViewController: UIViewController {
       self.changeUIStateAfterFetch(successful)
       self.definitionCollectionView.reloadSections([0])
       self.definitionCollectionView.scrollToItem(at: [0,0], at: .top, animated: false)
+      self.keyboardCollectionView.reloadData()
     }
   }
   
@@ -574,9 +622,9 @@ class ViewController: UIViewController {
               }
             }
             if let audio = word.phonetics.first?.audio {
-                self?.word = Word(word: word.word.replacingOccurrences(of: "-", with: ""),
-                                  definition: definition,
-                                  audio: audio)
+              self?.word = Word(word: word.word.replacingOccurrences(of: "-", with: ""),
+                                definition: definition,
+                                audio: audio)
               print(self!.word)
               self?.initPlayer()
               completion(true)
@@ -606,12 +654,24 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
       if let word = word { return word.definition.count }
       return 1
     } else {
-      if keyboardOption == .keyboard {
-        if let section = KeyboardSection(rawValue: sectionIndex) {
+      if let section = KeyboardSection(rawValue: sectionIndex) {
+        if keyboardOption == .keyboard {
           switch section {
-          case .one: return Keyboard.getItems(at: .one).count
-          case .two: return Keyboard.getItems(at: .two).count
-          case .three: return Keyboard.getItems(at: .three).count
+          case .one: return Keyboard.getKeyboardItems(at: .one).count
+          case .two: return Keyboard.getKeyboardItems(at: .two).count
+          case .three: return Keyboard.getKeyboardItems(at: .three).count
+          }
+        } else if keyboardOption == .shuffled {
+          switch section {
+          case .one: return shuffledWord[0].count
+          case .two: return shuffledWord[1].count
+          case .three: return shuffledWord[2].count
+          }
+        } else if keyboardOption == .concealed {
+          switch section {
+          case .one: return concealedWord[0].count
+          case .two: return concealedWord[1].count
+          case .three: return concealedWord[2].count
           }
         }
       }
@@ -638,8 +698,16 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     } else {
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: KeyboardCollectionViewCell.reuseIdentifier, for: indexPath) as! KeyboardCollectionViewCell
       guard let section = KeyboardSection(rawValue: indexPath.section) else { return UICollectionViewCell() }
-      let items = Keyboard.getItems(at: section)
-      cell.button.setTitle(items[indexPath.item], for: .normal)
+      let items: [String] = {
+        switch keyboardOption {
+        case .keyboard: return Keyboard.getKeyboardItems(at: section)
+        case .shuffled: return shuffledWord[indexPath.section]
+        case .concealed: return concealedWord[indexPath.section]
+        }
+      }()
+      cell.letterButton.setTitle(items[indexPath.item], for: .normal)
+      cell.letterButton.addTarget(cell, action: #selector(KeyboardCollectionViewCell.keyboardPressed(_:)), for: .touchUpInside)
+      cell.delegate = self
       return cell
     }
   }
@@ -660,3 +728,28 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
   
 }
 
+extension ViewController: KeyboardCollectionViewCellDelegate {
+  func keyPressed(for key: String) {
+    
+    let word: String = {
+      if let text = self.guessLabel.text {
+        if key.count == 1 { return text + key }
+        else if key == "DEL" { return String(text.dropLast()) }
+        else { return "" }
+      }
+      return ""
+    }()
+    let style: UIFont.TextStyle = {
+      if (0...15).contains(word.count) { return .largeTitle }
+      else if (16...18).contains(word.count) { return .title1 }
+      else { return .title2 }
+    }()
+    
+    UIView.animate(withDuration: 0.30) {
+      self.guessLabel.font = .preferredFont(forTextStyle: style)
+      self.guessLabel.text = word.count > 22 ? "" : word
+      self.view.layoutIfNeeded()
+    }
+  }
+  
+}
