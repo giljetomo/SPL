@@ -2,7 +2,7 @@
 //  UILabel+boldRegularText.swift
 //  Spelling
 //
-//  Created by Macbook Pro on 2021-06-18.
+//  Created by Gil Jetomo on 2021-06-18.
 //
 
 import UIKit

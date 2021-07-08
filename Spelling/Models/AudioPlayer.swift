@@ -2,7 +2,7 @@
 //  AudioPlayer.swift
 //  Spelling
 //
-//  Created by Macbook Pro on 2021-06-15.
+//  Created by Gil Jetomo on 2021-06-15.
 //
 
 import Foundation

@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  Spelling
 //
-//  Created by Macbook Pro on 2021-06-14.
+//  Created by Gil Jetomo on 2021-06-14.
 //
 
 import UIKit
@@ -25,8 +25,8 @@ class ViewController: UIViewController {
       for (partOfSpeech, _) in word.definition {
         self.partOfSpeech.append(partOfSpeech)
       }
-      shuffledWord = Keyboard.getShuffledWord(for: word.word)
-      concealedWord = Keyboard.getConcealedWord(word: word.word)
+      shuffledWord = Keyboard.getShuffledWord(for: word.text)
+      concealedWord = Keyboard.getConcealedWord(word: word.text)
     }
   }
   var country: Country = .US
@@ -222,7 +222,7 @@ class ViewController: UIViewController {
     lbl.textAlignment = .center
     return lbl
   }()
-  let nextB: UIButton = {
+  let nextAndSubmitButton: UIButton = {
     let btn = UIButton()
     btn.setTitle("Next", for: .normal)
     btn.translatesAutoresizingMaskIntoConstraints = false
@@ -250,8 +250,8 @@ class ViewController: UIViewController {
           self.definitionCollectionView.reloadData()
           self.keyboardCollectionView.reloadData()
         }
-        self.nextB.setTitle(successful ? "Submit" : "Next", for: .normal)
-        self.nextB.isHidden = successful
+        self.nextAndSubmitButton.setTitle(successful ? "Submit" : "Next", for: .normal)
+        self.nextAndSubmitButton.isHidden = successful
       }
     }
     
@@ -337,7 +337,7 @@ class ViewController: UIViewController {
     view.addSubview(definitionView)
     view.addSubview(audioVStackView)
     view.addSubview(guessLabelView)
-    view.addSubview(nextB)
+    view.addSubview(nextAndSubmitButton)
     view.addSubview(keyboardSectionView)
     view.addSubview(foregroundView)
     view.addSubview(keyboardView)
@@ -432,14 +432,12 @@ class ViewController: UIViewController {
     keyboardHStackView.centerYAnchor.constraint(equalTo: keyboardView.centerYAnchor).isActive = true
     keyboardHStackView.leadingAnchor.constraint(equalTo: keyboardView.leadingAnchor, constant: 0).isActive = true
     
-    nextB.topAnchor.constraint(equalTo: keyboardSectionView.bottomAnchor, constant: 20).isActive = true
-    nextB.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
+    nextAndSubmitButton.topAnchor.constraint(equalTo: keyboardSectionView.bottomAnchor, constant: 20).isActive = true
+    nextAndSubmitButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
   }
   
   func initPlayer() {
-    if let word = word {
-      AudioPlayer.shared.initPlayer(with: word.audio)
-    }
+    if let word = word { AudioPlayer.shared.initPlayer(with: word.audio) }
   }
   
   @objc func keyboardChanged(_ sender: UISegmentedControl) {
@@ -454,7 +452,6 @@ class ViewController: UIViewController {
   
   
   @objc func keyboardTapped() {
-    
     keyboardViewIsOpen.toggle()
     
     let constant =
@@ -513,46 +510,45 @@ class ViewController: UIViewController {
         self?.isAudioMuted = false
       }
     }
-    playImageViewSetColor()
+    setPlayImageViewColor()
     AudioPlayer.shared.setVolume(to: sender.value)
     if sender.value > 0.0 { playAudio() }
   }
   
   @objc func changeSlider(_ sender: UISlider) {
     sender.alpha = 1.0
-    UIView.animate(withDuration: 0.30) {
-      sender.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-    }
-    
+    UIView.animate(withDuration: 0.30) { sender.transform = CGAffineTransform(scaleX: 1.3, y: 1.3) }
   }
   
   func changeUIStateAfterFetch(_ successful: Bool) {
     audioImageView.isUserInteractionEnabled = successful && !isAudioMuted
     volumeSlider.isUserInteractionEnabled = successful
     keyboardView.isUserInteractionEnabled = successful && !answerSubmitted
-    playImageViewSetColor()
+    setPlayImageViewColor()
+    nextAndSubmitButton.setTitle(successful ? "Submit" : "Next", for: .normal)
+    nextAndSubmitButton.isHidden = successful
     if successful { playAudio() }
   }
   
   @objc func changeAudioState() {
     audioImageView.isUserInteractionEnabled.toggle()
     volumeSlider.isUserInteractionEnabled.toggle()
-    nextB.isEnabled.toggle()
+    nextAndSubmitButton.isEnabled.toggle()
     
     if audioImageView.isUserInteractionEnabled {
       UIView.animate(withDuration: 0.10) {
-        self.playImageViewSetColor()
+        self.setPlayImageViewColor()
         self.audioImageView.transform = .identity
       }
     } else {
       UIView.animate(withDuration: 0.50) {
-        self.playImageViewSetColor()
+        self.setPlayImageViewColor()
         self.audioImageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
       }
     }
   }
   
-  fileprivate func playImageViewSetColor() {
+  fileprivate func setPlayImageViewColor() {
     audioImageView.tintColor = audioImageView.isUserInteractionEnabled ? .systemBlue : .gray
   }
   
@@ -563,7 +559,7 @@ class ViewController: UIViewController {
       keyboardCollectionView.isUserInteractionEnabled = false
       keyboardView.isUserInteractionEnabled = false
       checkAnswer()
-      nextB.setTitle("Next", for: .normal)
+      nextAndSubmitButton.setTitle("Next", for: .normal)
     } else {
       index += 1
       answerSubmitted = false
@@ -576,15 +572,12 @@ class ViewController: UIViewController {
         self.definitionCollectionView.scrollToItem(at: [0,0], at: .top, animated: false)
         self.keyboardCollectionView.reloadData()
         self.keyboardCollectionView.isUserInteractionEnabled = true
-        
-        self.nextB.setTitle(successful ? "Submit" : "Next", for: .normal)
-        self.nextB.isHidden = successful
       }
     }
   }
   
   private func checkAnswer() {
-    guard let text = word?.word else { return }
+    guard let text = word?.text else { return }
     
     
     if text == guessLabel.text { print(true) }
@@ -652,7 +645,7 @@ class ViewController: UIViewController {
               }
             }
             if let audio = word.phonetics.first?.audio {
-              self?.word = Word(word: word.word.replacingOccurrences(of: "-", with: ""),
+              self?.word = Word(text: word.word.replacingOccurrences(of: "-", with: ""),
                                 definition: definition,
                                 audio: audio)
               //              print(self!.word)
@@ -673,18 +666,17 @@ class ViewController: UIViewController {
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   
   func numberOfSections(in collectionView: UICollectionView) -> Int {
-    if collectionView == self.keyboardCollectionView {
-      return 3
-    }
-    return 2
+    if collectionView == keyboardCollectionView { return 3 }
+    else if collectionView == definitionCollectionView { return 2 }
+    return 0
   }
   
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection sectionIndex: Int) -> Int {
-    if collectionView == self.definitionCollectionView {
+    if collectionView == definitionCollectionView {
       if sectionIndex == 0 { return answerSubmitted ? 1 : 0 }
       else {
         if let word = word { return word.definition.count == 0 ? 1 : word.definition.count }
-        return 1
+        return 1 //to display the error message as an item
       }
     } else {
       if word == nil { return 0 }
@@ -714,14 +706,14 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    if collectionView == self.definitionCollectionView {
+    if collectionView == definitionCollectionView {
       if indexPath.section == 0 {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.reuseIdentifier, for: indexPath) as! WordCollectionViewCell
         
         UIView.animate(withDuration: 0.5, delay: 0.5 * Double(indexPath.item), usingSpringWithDamping: 1, initialSpringVelocity: 0.5, animations: {
           AnimationUtility.viewSlideInFromTop(toBottom: cell)
         })
-        guard let text = word?.word else { return cell }
+        guard let text = word?.text else { return cell }
         cell.setup(with: text)
         return cell
       } else {
@@ -731,7 +723,8 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
           AnimationUtility.viewSlideInFromTop(toBottom: cell)
         })
         
-        guard let word = word?.definition else {
+        guard let word = word?.definition
+        else {
           cell.setup(with: "Error", and: "Please press next")
           return cell
         }
@@ -762,14 +755,14 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
   }
   
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-    if collectionView == self.definitionCollectionView {
+    if collectionView == definitionCollectionView {
       cell.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
       UIView.animate(withDuration: 0.25) { cell.transform = .identity }
     }
   }
   
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    if collectionView == self.keyboardCollectionView {
+    if collectionView == keyboardCollectionView {
       return CGSize(width: (keyboardSectionView.frame.width/9)-5, height: (keyboardSectionView.frame.width/9)-5)
     }
     return .zero
@@ -777,18 +770,18 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
   
 }
 
+// MARK: - KeyboardCollectionViewCellDelegate
 extension ViewController: KeyboardCollectionViewCellDelegate {
   func keyPressed(for key: String) {
-    
     let word: String = {
-      if let text = self.guessLabel.text {
+      if let text = guessLabel.text {
         if key.count == 1 { return text + key }
         else if key == "DEL" { return String(text.dropLast()) }
         else { return "" }
       }
       return ""
     }()
-    nextB.isHidden = word.count < 4
+    nextAndSubmitButton.isHidden = word.count < 4
     let style: UIFont.TextStyle = {
       if (0...15).contains(word.count) { return .largeTitle }
       else if (16...18).contains(word.count) { return .title1 }
