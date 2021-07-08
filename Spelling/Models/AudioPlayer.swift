@@ -47,8 +47,11 @@ class AudioPlayer {
     //player.playImmediately(atRate: 0.7)
   }
   
+  func setVolume(to level: Float) {
+    player.volume = level
+  }
+  
   @objc func playerEndedPlaying(_ notification: Notification) {
-    print(#function)
     player.seek(to: CMTime.zero)
     NotificationCenter.default.post(name: .playbackEnded, object: nil)
   }
