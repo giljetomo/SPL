@@ -12,7 +12,8 @@ protocol KeyboardCollectionViewCellDelegate: class {
 }
 
 class KeyboardCollectionViewCell: UICollectionViewCell {
-
+  
+  var isAnimated = false
   static let reuseIdentifier = "filterCell"
   weak var delegate: KeyboardCollectionViewCellDelegate?
   

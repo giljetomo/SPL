@@ -12,6 +12,7 @@
 		5244D0D826866D3000BFAF6B /* UIButton+HighlightedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */; };
 		5244D0D926866D3000BFAF6B /* KeyboardCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */; };
 		524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */; };
+		524CFE23269915CE00510D2F /* Favorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CFE22269915CD00510D2F /* Favorite.swift */; };
 		52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA0182678316400E1F86A /* AppDelegate.swift */; };
 		52ACA01B2678316400E1F86A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA01A2678316400E1F86A /* SceneDelegate.swift */; };
 		52ACA01D2678316400E1F86A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA01C2678316400E1F86A /* ViewController.swift */; };
@@ -37,6 +38,7 @@
 		5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+HighlightedButton.swift"; sourceTree = "<group>"; };
 		5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardCollectionViewCell.swift; sourceTree = "<group>"; };
 		524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCollectionViewCell.swift; sourceTree = "<group>"; };
+		524CFE22269915CD00510D2F /* Favorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Favorite.swift; sourceTree = "<group>"; };
 		52ACA0152678316400E1F86A /* Spelling.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spelling.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52ACA0182678316400E1F86A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52ACA01A2678316400E1F86A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -92,7 +94,6 @@
 				52ACA05D267BE15C00E1F86A /* Supporting Files */,
 				52ACA01C2678316400E1F86A /* ViewController.swift */,
 				5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */,
-				5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */,
 				52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */,
 				524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */,
 				52ACA068267D213D00E1F86A /* Utils */,
@@ -112,6 +113,7 @@
 				52ACA03A267837BE00E1F86A /* Endpoint.swift */,
 				5244D0D3268667FF00BFAF6B /* Keyboard.swift */,
 				52ACA03D267837F300E1F86A /* Language.swift */,
+				524CFE22269915CD00510D2F /* Favorite.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -131,6 +133,7 @@
 		52ACA068267D213D00E1F86A /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */,
 				52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */,
 				5244D0CB2682650400BFAF6B /* AnimationUtility.swift */,
 				52ACA05A267BBEB900E1F86A /* UIPaddedLabel.swift */,
@@ -223,6 +226,7 @@
 				52ACA034267832AC00E1F86A /* WordAPI.swift in Sources */,
 				52ACA066267D210900E1F86A /* UILabel+boldRegularText.swift in Sources */,
 				52ACA03E267837F300E1F86A /* Language.swift in Sources */,
+				524CFE23269915CE00510D2F /* Favorite.swift in Sources */,
 				52ACA04C26794A6B00E1F86A /* AudioPlayer.swift in Sources */,
 				5244D0D4268667FF00BFAF6B /* Keyboard.swift in Sources */,
 				52ACA01B2678316400E1F86A /* SceneDelegate.swift in Sources */,

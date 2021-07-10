@@ -11,10 +11,15 @@ import AVFoundation
 
 class ViewController: UIViewController {
   
+  
+  var isFirstLoad = true
+  var isLiked = false
+  
   var answerSubmitted = false
+  var isPreviousFetchSuccessful = false
   var keyboardOption: KeyboardOption = .keyboard
-  var shuffledWord = [[String]](repeating: [String](), count: 3)
-  var concealedWord = [[String]](repeating: [String](), count: 3)
+  var shuffledWord = [[String]]()
+  var concealedWord = [[String]]()
   var word: Word? {
     didSet {
       guard let word = self.word else {
@@ -30,10 +35,9 @@ class ViewController: UIViewController {
     }
   }
   var country: Country = .US
-  var successfulFetch = true
   var partOfSpeech = [String]()
   
-  let words = ["diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  let words = ["sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
   var index = 0
   
   let topView: UIView = {
@@ -252,6 +256,7 @@ class ViewController: UIViewController {
         }
         self.nextAndSubmitButton.setTitle(successful ? "Submit" : "Next", for: .normal)
         self.nextAndSubmitButton.isHidden = successful
+        self.isPreviousFetchSuccessful = successful
       }
     }
     
@@ -424,7 +429,7 @@ class ViewController: UIViewController {
     
     keyboardView.addGestureRecognizer(keyboardTapRecognizer)
     keyboardView.addGestureRecognizer(keyboardPanRecognizer)
-    keyboardView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    keyboardView.centerYAnchor.constraint(equalTo: guessLabelView.centerYAnchor).isActive = true
     keyboardView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
     
     keyboardView.addSubview(keyboardHStackView)
@@ -525,9 +530,9 @@ class ViewController: UIViewController {
     volumeSlider.isUserInteractionEnabled = successful
     keyboardView.isUserInteractionEnabled = successful && !answerSubmitted
     setPlayImageViewColor()
-    nextAndSubmitButton.setTitle(successful ? "Submit" : "Next", for: .normal)
-    nextAndSubmitButton.isHidden = successful
-    if successful { playAudio() }
+    nextAndSubmitButton.setTitle(successful && !answerSubmitted ? "Submit" : "Next", for: .normal)
+    nextAndSubmitButton.isHidden = successful && !answerSubmitted
+    if successful && volumeSlider.value > 0.0 { playAudio() }
   }
   
   @objc func changeAudioState() {
@@ -555,7 +560,18 @@ class ViewController: UIViewController {
   @objc func fetchNextWord(_ sender: UIButton) {
     if sender.title(for: .normal) == "Submit" {
       answerSubmitted = true
+      
+      isFirstLoad = true
+      CATransaction.begin()
+      CATransaction.setCompletionBlock {
+        self.isFirstLoad = false
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(200)) { [weak self] in
+          self?.definitionCollectionView.reloadItems(at: [IndexPath(item: 0, section: 0)])
+        }
+      }
       definitionCollectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
+      CATransaction.commit()
+      
       keyboardCollectionView.isUserInteractionEnabled = false
       keyboardView.isUserInteractionEnabled = false
       checkAnswer()
@@ -563,6 +579,7 @@ class ViewController: UIViewController {
     } else {
       index += 1
       answerSubmitted = false
+      isLiked = false
       partOfSpeech.removeAll()
       guessLabel.text?.removeAll()
       fetchWordAPI(with: country) { (successful) in
@@ -570,8 +587,12 @@ class ViewController: UIViewController {
         self.changeUIStateAfterFetch(successful)
         self.definitionCollectionView.reloadData()
         self.definitionCollectionView.scrollToItem(at: [0,0], at: .top, animated: false)
-        self.keyboardCollectionView.reloadData()
         self.keyboardCollectionView.isUserInteractionEnabled = true
+        
+        if (!self.isPreviousFetchSuccessful && self.keyboardOption == .keyboard) ||
+            (self.keyboardOption != .keyboard || !successful)
+        { self.keyboardCollectionView.reloadData() }
+        self.isPreviousFetchSuccessful = successful
       }
     }
   }
@@ -710,10 +731,24 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
       if indexPath.section == 0 {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.reuseIdentifier, for: indexPath) as! WordCollectionViewCell
         
-        UIView.animate(withDuration: 0.5, delay: 0.5 * Double(indexPath.item), usingSpringWithDamping: 1, initialSpringVelocity: 0.5, animations: {
-          AnimationUtility.viewSlideInFromTop(toBottom: cell)
-        })
+        cell.heartImageView.isHidden = true
+        cell.liked = isLiked ? .liked : .unliked
+        cell.delegate = self
+        
         guard let text = word?.text else { return cell }
+        
+        if isFirstLoad {
+          UIView.animate(withDuration: 0.5, delay: 0.5 * Double(indexPath.item), usingSpringWithDamping: 1, initialSpringVelocity: 0.5, animations: {
+            AnimationUtility.viewSlideInFromTop(toBottom: cell)
+          })
+        } else {
+          UIView.transition(with: cell.heartImageView, duration: 0.9, options: .transitionFlipFromRight) {
+            cell.heartImageView.isHidden = false
+          } completion: { (_) in
+            UIView.transition(with: cell.heartImageView, duration: 0.9, options: .transitionFlipFromLeft) {
+            }
+          }
+        }
         cell.setup(with: text)
         return cell
       } else {
@@ -739,6 +774,13 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
       }
     } else {
       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: KeyboardCollectionViewCell.reuseIdentifier, for: indexPath) as! KeyboardCollectionViewCell
+      
+      UIView.animate(withDuration: 0.5, delay: 0.5, animations: {
+        if indexPath.section == 0 { AnimationUtility.viewSlideInFromTop(toBottom: cell) }
+        else if indexPath.section == 1 { AnimationUtility.viewSlideInFromRight(toLeft: cell) }
+        else { AnimationUtility.viewSlideInFromBottom(toTop: cell) }
+      })
+      
       guard let section = KeyboardSection(rawValue: indexPath.section) else { return UICollectionViewCell() }
       let items: [String] = {
         switch keyboardOption {
@@ -773,6 +815,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 // MARK: - KeyboardCollectionViewCellDelegate
 extension ViewController: KeyboardCollectionViewCellDelegate {
   func keyPressed(for key: String) {
+    guard let text = self.word?.text else { return }
     let word: String = {
       if let text = guessLabel.text {
         if key.count == 1 { return text + key }
@@ -781,7 +824,8 @@ extension ViewController: KeyboardCollectionViewCellDelegate {
       }
       return ""
     }()
-    nextAndSubmitButton.isHidden = word.count < 4
+    nextAndSubmitButton.isHidden = word.count < Int(floor(Float(text.count) * 0.90))
+    
     let style: UIFont.TextStyle = {
       if (0...15).contains(word.count) { return .largeTitle }
       else if (16...18).contains(word.count) { return .title1 }
@@ -795,4 +839,12 @@ extension ViewController: KeyboardCollectionViewCellDelegate {
     }
   }
   
+}
+
+// MARK: - WordCollectionViewCellDelegate
+extension ViewController: WordCollectionViewCellDelegate {
+  func isWordLiked(status: Bool) {
+    isLiked = status
+    print(isLiked)
+  }
 }

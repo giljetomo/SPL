@@ -13,12 +13,13 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
   
   let definitionLabel: UIPaddedLabel = {
     let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 5, right: 5)
-    lbl.font = .systemFont(ofSize: 17)
     lbl.translatesAutoresizingMaskIntoConstraints = false
     lbl.numberOfLines = 0
     lbl.textAlignment = .center
     lbl.layer.masksToBounds = true
     lbl.layer.cornerRadius = 5
+    lbl.font = UIFont.preferredFont(forTextStyle: .title3)
+    lbl.adjustsFontForContentSizeCategory = true
     lbl.adjustsFontSizeToFitWidth = true
 //    lbl.backgroundColor = .lightGray
     return lbl
