@@ -68,7 +68,7 @@ class WordCollectionViewCell: UICollectionViewCell {
     contentView.addSubview(view)
     //  constraints need to be applied so the button does not overflow outside the contentView
     view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5).isActive = true
-    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5).isActive = true
+    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: 0).isActive = true
     view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
     view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
     contentView.layer.cornerRadius = 5

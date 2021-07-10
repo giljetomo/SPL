@@ -222,7 +222,7 @@ class ViewController: UIViewController {
     lbl.translatesAutoresizingMaskIntoConstraints = false
     lbl.text = ""
     lbl.font = UIFont.preferredFont(forTextStyle: .largeTitle)
-    lbl.adjustsFontForContentSizeCategory = true
+    lbl.adjustsFontSizeToFitWidth = true
     lbl.textAlignment = .center
     return lbl
   }()
@@ -400,7 +400,9 @@ class ViewController: UIViewController {
     guessLabelView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     
     guessLabelView.addSubview(guessLabel)
-    guessLabel.centerXAnchor.constraint(equalTo: guessLabelView.centerXAnchor).isActive = true
+//    guessLabel.centerXAnchor.constraint(equalTo: guessLabelView.centerXAnchor).isActive = true
+    guessLabel.leadingAnchor.constraint(equalTo: guessLabelView.leadingAnchor, constant: 10).isActive = true
+    guessLabel.trailingAnchor.constraint(equalTo: guessLabelView.trailingAnchor, constant: -10).isActive = true
     guessLabel.centerYAnchor.constraint(equalTo: guessLabelView.centerYAnchor).isActive = true
     
     keyboardSectionView.topAnchor.constraint(equalTo: guessLabelView.bottomAnchor, constant: 10).isActive = true
@@ -815,6 +817,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 // MARK: - KeyboardCollectionViewCellDelegate
 extension ViewController: KeyboardCollectionViewCellDelegate {
   func keyPressed(for key: String) {
+
     guard let text = self.word?.text else { return }
     let word: String = {
       if let text = guessLabel.text {
@@ -824,17 +827,11 @@ extension ViewController: KeyboardCollectionViewCellDelegate {
       }
       return ""
     }()
-    nextAndSubmitButton.isHidden = word.count < Int(floor(Float(text.count) * 0.90))
-    
-    let style: UIFont.TextStyle = {
-      if (0...15).contains(word.count) { return .largeTitle }
-      else if (16...18).contains(word.count) { return .title1 }
-      else { return .title2 }
-    }()
     
     UIView.animate(withDuration: 0.30) {
-      self.guessLabel.font = .preferredFont(forTextStyle: style)
       self.guessLabel.text = word.count > 22 ? "" : word
+      self.nextAndSubmitButton.isHidden = word.count < Int(floor(Float(text.count) * 0.90))
+      self.nextAndSubmitButton.alpha = self.nextAndSubmitButton.isHidden ? 0 : 1
       self.view.layoutIfNeeded()
     }
   }
