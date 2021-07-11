@@ -44,7 +44,7 @@ struct Keyboard {
                 ["f", "v", "b", "p"],
                 ["g", "j", "h"],
                 ["i", "y", "e", "a"],
-                ["a", "o", "u", "w"],
+                ["a", "o", "w"],
                 ["k", "c", "q"]]
     
     for set in sets {

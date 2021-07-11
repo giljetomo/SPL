@@ -11,7 +11,7 @@ import AVFoundation
 
 class ViewController: UIViewController {
   
-  
+  //tracking the display of correct word in the collection view to be followed by heartImage
   var isFirstLoad = true
   var isLiked = false
   
@@ -37,7 +37,7 @@ class ViewController: UIViewController {
   var country: Country = .US
   var partOfSpeech = [String]()
   
-  let words = ["sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  let words = ["behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
   var index = 0
   
   let topView: UIView = {
@@ -400,7 +400,7 @@ class ViewController: UIViewController {
     guessLabelView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     
     guessLabelView.addSubview(guessLabel)
-//    guessLabel.centerXAnchor.constraint(equalTo: guessLabelView.centerXAnchor).isActive = true
+    //    guessLabel.centerXAnchor.constraint(equalTo: guessLabelView.centerXAnchor).isActive = true
     guessLabel.leadingAnchor.constraint(equalTo: guessLabelView.leadingAnchor, constant: 10).isActive = true
     guessLabel.trailingAnchor.constraint(equalTo: guessLabelView.trailingAnchor, constant: -10).isActive = true
     guessLabel.centerYAnchor.constraint(equalTo: guessLabelView.centerYAnchor).isActive = true
@@ -563,12 +563,22 @@ class ViewController: UIViewController {
     if sender.title(for: .normal) == "Submit" {
       answerSubmitted = true
       
+      nextAndSubmitButton.alpha = 0
       isFirstLoad = true
       CATransaction.begin()
       CATransaction.setCompletionBlock {
         self.isFirstLoad = false
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(200)) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) { [weak self] in
+          CATransaction.begin()
+          CATransaction.setCompletionBlock {
+            UIView.transition(with: self!.nextAndSubmitButton, duration: 1.0, options: .transitionCrossDissolve) {
+              self?.nextAndSubmitButton.setTitle("Next", for: .normal)
+              self?.nextAndSubmitButton.alpha = 1
+            }
+          }
           self?.definitionCollectionView.reloadItems(at: [IndexPath(item: 0, section: 0)])
+          self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+          CATransaction.commit()
         }
       }
       definitionCollectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
@@ -577,7 +587,6 @@ class ViewController: UIViewController {
       keyboardCollectionView.isUserInteractionEnabled = false
       keyboardView.isUserInteractionEnabled = false
       checkAnswer()
-      nextAndSubmitButton.setTitle("Next", for: .normal)
     } else {
       index += 1
       answerSubmitted = false
@@ -588,7 +597,7 @@ class ViewController: UIViewController {
         if !successful { self.word = nil }
         self.changeUIStateAfterFetch(successful)
         self.definitionCollectionView.reloadData()
-        self.definitionCollectionView.scrollToItem(at: [0,0], at: .top, animated: false)
+        self.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
         self.keyboardCollectionView.isUserInteractionEnabled = true
         
         if (!self.isPreviousFetchSuccessful && self.keyboardOption == .keyboard) ||
@@ -740,7 +749,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         guard let text = word?.text else { return cell }
         
         if isFirstLoad {
-          UIView.animate(withDuration: 0.5, delay: 0.5 * Double(indexPath.item), usingSpringWithDamping: 1, initialSpringVelocity: 0.5, animations: {
+          UIView.animate(withDuration: 0.5, delay: 0.5, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, animations: {
             AnimationUtility.viewSlideInFromTop(toBottom: cell)
           })
         } else {
@@ -756,7 +765,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
       } else {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DefinitionCollectionViewCell.reuseIdentifier, for: indexPath) as! DefinitionCollectionViewCell
         
-        UIView.animate(withDuration: 0.5, delay: 0.5 * Double(indexPath.item), usingSpringWithDamping: 1, initialSpringVelocity: 0.5, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.5, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, animations: {
           AnimationUtility.viewSlideInFromTop(toBottom: cell)
         })
         
@@ -817,15 +826,13 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 // MARK: - KeyboardCollectionViewCellDelegate
 extension ViewController: KeyboardCollectionViewCellDelegate {
   func keyPressed(for key: String) {
-
+    
     guard let text = self.word?.text else { return }
     let word: String = {
-      if let text = guessLabel.text {
-        if key.count == 1 { return text + key }
-        else if key == "DEL" { return String(text.dropLast()) }
-        else { return "" }
-      }
-      return ""
+      guard let text = guessLabel.text else { return "" }
+      if key.count == 1 { return text + key }
+      else if key == "DEL" { return String(text.dropLast()) }
+      else { return "" }
     }()
     
     UIView.animate(withDuration: 0.30) {
