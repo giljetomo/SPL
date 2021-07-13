@@ -15,6 +15,7 @@ class ViewController: UIViewController {
   var isFirstLoad = true
   var isLiked = false
   
+  var didChangeDiction = false
   var answerSubmitted = false
   var isPreviousFetchSuccessful = false
   var keyboardOption: KeyboardOption = .keyboard
@@ -37,7 +38,7 @@ class ViewController: UIViewController {
   var country: Country = .US
   var partOfSpeech = [String]()
   
-  let words = ["behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  let words = ["panacea","uncommunicativeness","abolitionary","panacea","behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
   var index = 0
   
   let topView: UIView = {
@@ -257,6 +258,7 @@ class ViewController: UIViewController {
         self.nextAndSubmitButton.setTitle(successful ? "Submit" : "Next", for: .normal)
         self.nextAndSubmitButton.isHidden = successful
         self.isPreviousFetchSuccessful = successful
+        self.dictionView.isUserInteractionEnabled = successful
       }
     }
     
@@ -528,13 +530,17 @@ class ViewController: UIViewController {
   }
   
   func changeUIStateAfterFetch(_ successful: Bool) {
+    dictionView.isUserInteractionEnabled = successful
     audioImageView.isUserInteractionEnabled = successful && !isAudioMuted
     volumeSlider.isUserInteractionEnabled = successful
     keyboardView.isUserInteractionEnabled = successful && !answerSubmitted
     setPlayImageViewColor()
+   
+    if successful && volumeSlider.value > 0.0 { playAudio() }
+    
+    guard !didChangeDiction else { return }
     nextAndSubmitButton.setTitle(successful && !answerSubmitted ? "Submit" : "Next", for: .normal)
     nextAndSubmitButton.isHidden = successful && !answerSubmitted
-    if successful && volumeSlider.value > 0.0 { playAudio() }
   }
   
   @objc func changeAudioState() {
@@ -591,6 +597,7 @@ class ViewController: UIViewController {
       index += 1
       answerSubmitted = false
       isLiked = false
+      didChangeDiction = false
       partOfSpeech.removeAll()
       guessLabel.text?.removeAll()
       fetchWordAPI(with: country) { (successful) in
@@ -657,7 +664,9 @@ class ViewController: UIViewController {
     country.toggle()
     changeLanguage()
     fetchWordAPI(with: country) { [weak self] (successful) in
-      self?.changeUIStateAfterFetch(successful)
+      self?.didChangeDiction = true
+      //some words don't have both diction available
+      if successful { self?.changeUIStateAfterFetch(successful) }
     }
   }
   

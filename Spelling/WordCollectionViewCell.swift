@@ -53,17 +53,16 @@ class WordCollectionViewCell: UICollectionViewCell {
     
     heartImageView.addGestureRecognizer(playTapRecognizer)
     
-    view.addSubview(wordLabel)
-    wordLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-    wordLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-    wordLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-    wordLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
-    
     view.addSubview(heartImageView)
     heartImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     heartImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
     heartImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.50).isActive = true
     heartImageView.widthAnchor.constraint(equalTo: heartImageView.heightAnchor, multiplier: 1).isActive = true
+    
+    view.addSubview(wordLabel)
+    wordLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    wordLabel.trailingAnchor.constraint(equalTo: heartImageView.leadingAnchor, constant: -5).isActive = true
+    wordLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: heartImageView.intrinsicContentSize.width).isActive = true
     
     contentView.addSubview(view)
     //  constraints need to be applied so the button does not overflow outside the contentView
