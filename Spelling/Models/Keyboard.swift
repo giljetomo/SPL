@@ -2,7 +2,7 @@
 //  Keyboard.swift
 //  Spelling
 //
-//  Created by Macbook Pro on 2021-06-25.
+//  Created by Gil Jetomo on 2021-06-25.
 //
 
 import Foundation
@@ -44,7 +44,7 @@ struct Keyboard {
                 ["f", "v", "b", "p"],
                 ["g", "j", "h"],
                 ["i", "y", "e", "a"],
-                ["a", "o", "u", "w"],
+                ["a", "o", "w"],
                 ["k", "c", "q"]]
     
     for set in sets {

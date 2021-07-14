@@ -2,7 +2,7 @@
 //  UIButton+HighlightedButton.swift
 //  MyRestaurants
 //
-//  Created by Macbook Pro on 2021-06-01.
+//  Created by Gil Jetomo on 2021-06-01.
 //
 
 import Foundation
