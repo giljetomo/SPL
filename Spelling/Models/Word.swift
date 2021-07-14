@@ -10,5 +10,5 @@ import Foundation
 struct Word {
   var text: String
   var definition: [String: String]
-  var audio: URL
+  var audio: URL?
 }

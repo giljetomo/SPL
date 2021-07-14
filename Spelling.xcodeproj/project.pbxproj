@@ -30,6 +30,7 @@
 		52ACA05B267BBEB900E1F86A /* UIPaddedLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA05A267BBEB900E1F86A /* UIPaddedLabel.swift */; };
 		52ACA060267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */; };
 		52ACA066267D210900E1F86A /* UILabel+boldRegularText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */; };
+		52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D50269E78A9000F6006 /* SpeechService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +59,7 @@
 		52ACA05A267BBEB900E1F86A /* UIPaddedLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPaddedLabel.swift; sourceTree = "<group>"; };
 		52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionCollectionViewCell.swift; sourceTree = "<group>"; };
 		52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+boldRegularText.swift"; sourceTree = "<group>"; };
+		52D55D50269E78A9000F6006 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 				52ACA033267832AC00E1F86A /* WordAPI.swift */,
 				52ACA0372678367300E1F86A /* WordInfoAPI.swift */,
 				52ACA04B26794A6B00E1F86A /* AudioPlayer.swift */,
+				52D55D50269E78A9000F6006 /* SpeechService.swift */,
 				52ACA057267BBA5F00E1F86A /* Level.swift */,
 				52ACA03A267837BE00E1F86A /* Endpoint.swift */,
 				5244D0D3268667FF00BFAF6B /* Keyboard.swift */,
@@ -220,6 +223,7 @@
 				524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */,
 				5244D0D826866D3000BFAF6B /* UIButton+HighlightedButton.swift in Sources */,
 				52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */,
+				52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */,
 				52ACA0382678367300E1F86A /* WordInfoAPI.swift in Sources */,
 				52ACA058267BBA6000E1F86A /* Level.swift in Sources */,
 				5244D0D926866D3000BFAF6B /* KeyboardCollectionViewCell.swift in Sources */,

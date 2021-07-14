@@ -15,6 +15,8 @@ class ViewController: UIViewController {
   var isFirstLoad = true
   var isLiked = false
   
+  var isFromSpeechService = false
+  
   var didChangeDiction = false
   var answerSubmitted = false
   var isPreviousFetchSuccessful = false
@@ -38,7 +40,7 @@ class ViewController: UIViewController {
   var country: Country = .US
   var partOfSpeech = [String]()
   
-  let words = ["panacea","uncommunicativeness","abolitionary","panacea","behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  let words = ["panacea","aeromechanic","abactinal","uncommunicativeness","abolitionary","panacea","behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
   var index = 0
   
   let topView: UIView = {
@@ -446,7 +448,7 @@ class ViewController: UIViewController {
   }
   
   func initPlayer() {
-    if let word = word { AudioPlayer.shared.initPlayer(with: word.audio) }
+    if let word = word { AudioPlayer.shared.initPlayer(with: word.audio!) }
   }
   
   @objc func keyboardChanged(_ sender: UISegmentedControl) {
@@ -502,7 +504,12 @@ class ViewController: UIViewController {
   
   @objc func playAudio() {
     changeAudioState()
-    AudioPlayer.shared.play()
+    if isFromSpeechService {
+      SpeechService.shared.say(word!.text, as: country == .US ? "en-US" : "en-GB", volume: volumeSlider.value)
+    } else {
+      AudioPlayer.shared.play()
+    }
+    
   }
   
   @objc func adjustVolume(_ sender: UISlider) {
@@ -520,7 +527,8 @@ class ViewController: UIViewController {
       }
     }
     setPlayImageViewColor()
-    AudioPlayer.shared.setVolume(to: sender.value)
+    if isFromSpeechService { SpeechService.shared.setVolume(to: sender.value) }
+    else { AudioPlayer.shared.setVolume(to: sender.value) }
     if sender.value > 0.0 { playAudio() }
   }
   
@@ -539,8 +547,8 @@ class ViewController: UIViewController {
     if successful && volumeSlider.value > 0.0 { playAudio() }
     
     guard !didChangeDiction else { return }
-    nextAndSubmitButton.setTitle(successful && !answerSubmitted ? "Submit" : "Next", for: .normal)
-    nextAndSubmitButton.isHidden = successful && !answerSubmitted
+    nextAndSubmitButton.setTitle(!answerSubmitted ? "Submit" : "Next", for: .normal)
+    nextAndSubmitButton.isHidden = !answerSubmitted
   }
   
   @objc func changeAudioState() {
@@ -601,8 +609,11 @@ class ViewController: UIViewController {
       partOfSpeech.removeAll()
       guessLabel.text?.removeAll()
       fetchWordAPI(with: country) { (successful) in
-        if !successful { self.word = nil }
-        self.changeUIStateAfterFetch(successful)
+        self.isFromSpeechService = !successful
+        if !successful {
+          self.word = Word(text: self.words[self.index], definition: [:], audio: nil)
+        }
+        self.changeUIStateAfterFetch(true)
         self.definitionCollectionView.reloadData()
         self.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
         self.keyboardCollectionView.isUserInteractionEnabled = true
@@ -663,11 +674,16 @@ class ViewController: UIViewController {
     }
     country.toggle()
     changeLanguage()
+    guard !isFromSpeechService else {
+      changeUIStateAfterFetch(true)
+      return
+    }
     fetchWordAPI(with: country) { [weak self] (successful) in
       self?.didChangeDiction = true
       //some words don't have both diction available
       if successful { self?.changeUIStateAfterFetch(successful) }
     }
+    
   }
   
   fileprivate func fetchWordAPI(with country: Country, completion: @escaping (Bool) -> Void) {
