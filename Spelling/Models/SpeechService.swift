@@ -23,7 +23,7 @@ class SpeechService: NSObject {
     speechService.delegate = self
   }
   
-  func say(_ word: String, as language: String, volume: Float) {
+  func say(_ word: String, in language: String, volume: Float) {
     utterance = AVSpeechUtterance(string: word)
     guard let utterance = self.utterance,
           let country = Country(rawValue: language.replacingOccurrences(of: "-", with: "_"))

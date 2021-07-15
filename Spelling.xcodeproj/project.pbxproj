@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		5244D0CC2682650400BFAF6B /* AnimationUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0CB2682650400BFAF6B /* AnimationUtility.swift */; };
 		5244D0D4268667FF00BFAF6B /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D3268667FF00BFAF6B /* Keyboard.swift */; };
-		5244D0D826866D3000BFAF6B /* UIButton+HighlightedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */; };
 		5244D0D926866D3000BFAF6B /* KeyboardCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */; };
 		524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */; };
 		524CFE23269915CE00510D2F /* Favorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CFE22269915CD00510D2F /* Favorite.swift */; };
@@ -36,7 +35,6 @@
 /* Begin PBXFileReference section */
 		5244D0CB2682650400BFAF6B /* AnimationUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationUtility.swift; sourceTree = "<group>"; };
 		5244D0D3268667FF00BFAF6B /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
-		5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+HighlightedButton.swift"; sourceTree = "<group>"; };
 		5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardCollectionViewCell.swift; sourceTree = "<group>"; };
 		524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCollectionViewCell.swift; sourceTree = "<group>"; };
 		524CFE22269915CD00510D2F /* Favorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Favorite.swift; sourceTree = "<group>"; };
@@ -136,7 +134,6 @@
 		52ACA068267D213D00E1F86A /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */,
 				52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */,
 				5244D0CB2682650400BFAF6B /* AnimationUtility.swift */,
 				52ACA05A267BBEB900E1F86A /* UIPaddedLabel.swift */,
@@ -221,7 +218,6 @@
 				52ACA04326783CFC00E1F86A /* Word.swift in Sources */,
 				5244D0CC2682650400BFAF6B /* AnimationUtility.swift in Sources */,
 				524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */,
-				5244D0D826866D3000BFAF6B /* UIButton+HighlightedButton.swift in Sources */,
 				52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */,
 				52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */,
 				52ACA0382678367300E1F86A /* WordInfoAPI.swift in Sources */,

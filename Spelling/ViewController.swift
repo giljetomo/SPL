@@ -14,12 +14,10 @@ class ViewController: UIViewController {
   //tracking the display of correct word in the collection view to be followed by heartImage
   var isFirstLoad = true
   var isLiked = false
-  
   var isFromSpeechService = false
-  
   var didChangeDiction = false
   var answerSubmitted = false
-  var isPreviousFetchSuccessful = false
+  
   var keyboardOption: KeyboardOption = .keyboard
   var shuffledWord = [[String]]()
   var concealedWord = [[String]]()
@@ -39,8 +37,9 @@ class ViewController: UIViewController {
   }
   var country: Country = .US
   var partOfSpeech = [String]()
-  
-  let words = ["panacea","aeromechanic","abactinal","uncommunicativeness","abolitionary","panacea","behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  //temp var
+  let words = ["abactinal","aaronic","panacea","aeromechanic","abactinal","uncommunicativeness","abolitionary","panacea","behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  //temp var
   var index = 0
   
   let topView: UIView = {
@@ -231,9 +230,10 @@ class ViewController: UIViewController {
   }()
   let nextAndSubmitButton: UIButton = {
     let btn = UIButton()
-    btn.setTitle("Next", for: .normal)
+    btn.setTitle("Submit", for: .normal)
     btn.translatesAutoresizingMaskIntoConstraints = false
     btn.setTitleColor(.systemBlue, for: .normal)
+    btn.isHidden = true
     btn.addTarget(self, action: #selector(fetchNextWord(_:)), for: .touchUpInside)
     return btn
   }()
@@ -243,24 +243,23 @@ class ViewController: UIViewController {
     view.backgroundColor = UIColor(named: "White")
     
     fetchWordAPI(with: country) {(successful) in
-      DispatchQueue.main.async {
-        self.definitionCollectionView.delegate = self
-        self.definitionCollectionView.dataSource = self
-        self.keyboardCollectionView.delegate = self
-        self.keyboardCollectionView.dataSource = self
-        
-        self.definitionCollectionView.collectionViewLayout = self.generateLayout()
-        self.keyboardCollectionView.collectionViewLayout = self.generateKeyboardLayout()
-        self.changeUIStateAfterFetch(successful)
-        UIView.animate(withDuration: 0.50) {
-          //          self.definitionCollectionView.reloadSections([0])
-          self.definitionCollectionView.reloadData()
-          self.keyboardCollectionView.reloadData()
+      DispatchQueue.main.async { [weak self] in
+        self?.isFromSpeechService = !successful
+        if !successful {
+          self?.word = Word(text: self!.words[self!.index], definition: [:], audio: nil)
         }
-        self.nextAndSubmitButton.setTitle(successful ? "Submit" : "Next", for: .normal)
-        self.nextAndSubmitButton.isHidden = successful
-        self.isPreviousFetchSuccessful = successful
-        self.dictionView.isUserInteractionEnabled = successful
+        self?.definitionCollectionView.delegate = self
+        self?.definitionCollectionView.dataSource = self
+        self?.keyboardCollectionView.delegate = self
+        self?.keyboardCollectionView.dataSource = self
+        
+        self?.definitionCollectionView.collectionViewLayout = self!.generateLayout()
+        self?.keyboardCollectionView.collectionViewLayout = self!.generateKeyboardLayout()
+        self?.changeUIStateAfterFetch(true)
+        UIView.animate(withDuration: 0.50) { [weak self] in
+          self?.definitionCollectionView.reloadData()
+          self?.keyboardCollectionView.reloadData()
+        }
       }
     }
     
@@ -456,8 +455,8 @@ class ViewController: UIViewController {
     
     guard let option = KeyboardOption(rawValue: sender.selectedSegmentIndex) else { return }
     keyboardOption = option
-    UIView.animate(withDuration: 0.5) {
-      self.keyboardCollectionView.reloadData()
+    UIView.animate(withDuration: 0.5) { [weak self] in
+      self?.keyboardCollectionView.reloadData()
     }
   }
   
@@ -496,20 +495,26 @@ class ViewController: UIViewController {
       if keyboardPosition.y < -20 { keyboardPosition.y = -20 }
       else if keyboardPosition.y > 250 { keyboardPosition.y = 250 }
       
-      UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseIn, animations: {
-        self.keyboardView.transform = CGAffineTransform(translationX: 0, y: self.keyboardPosition.y)
-      })
+      UIView.animate(withDuration: 0.5,
+                     delay: 0,
+                     usingSpringWithDamping: 1,
+                     initialSpringVelocity: 1,
+                     options: .curveEaseIn,
+                     animations: { [weak self] in
+                      self?.keyboardView.transform = CGAffineTransform(translationX: 0, y: self!.keyboardPosition.y)
+                     })
     }
   }
   
   @objc func playAudio() {
     changeAudioState()
     if isFromSpeechService {
-      SpeechService.shared.say(word!.text, as: country == .US ? "en-US" : "en-GB", volume: volumeSlider.value)
+      guard let text = word?.text else { return }
+      let language = country.rawValue.replacingOccurrences(of: "_", with: "-")
+      SpeechService.shared.say(text, in: language, volume: volumeSlider.value)
     } else {
       AudioPlayer.shared.play()
     }
-    
   }
   
   @objc func adjustVolume(_ sender: UISlider) {
@@ -538,13 +543,11 @@ class ViewController: UIViewController {
   }
   
   func changeUIStateAfterFetch(_ successful: Bool) {
-    dictionView.isUserInteractionEnabled = successful
-    audioImageView.isUserInteractionEnabled = successful && !isAudioMuted
-    volumeSlider.isUserInteractionEnabled = successful
-    keyboardView.isUserInteractionEnabled = successful && !answerSubmitted
+    audioImageView.isUserInteractionEnabled = !isAudioMuted
+    keyboardView.isUserInteractionEnabled = !answerSubmitted
     setPlayImageViewColor()
    
-    if successful && volumeSlider.value > 0.0 { playAudio() }
+    if volumeSlider.value > 0.0 { playAudio() }
     
     guard !didChangeDiction else { return }
     nextAndSubmitButton.setTitle(!answerSubmitted ? "Submit" : "Next", for: .normal)
@@ -557,14 +560,14 @@ class ViewController: UIViewController {
     nextAndSubmitButton.isEnabled.toggle()
     
     if audioImageView.isUserInteractionEnabled {
-      UIView.animate(withDuration: 0.10) {
-        self.setPlayImageViewColor()
-        self.audioImageView.transform = .identity
+      UIView.animate(withDuration: 0.10) { [weak self] in
+        self?.setPlayImageViewColor()
+        self?.audioImageView.transform = .identity
       }
     } else {
-      UIView.animate(withDuration: 0.50) {
-        self.setPlayImageViewColor()
-        self.audioImageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+      UIView.animate(withDuration: 0.50) { [weak self] in
+        self?.setPlayImageViewColor()
+        self?.audioImageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
       }
     }
   }
@@ -576,9 +579,12 @@ class ViewController: UIViewController {
   @objc func fetchNextWord(_ sender: UIButton) {
     if sender.title(for: .normal) == "Submit" {
       answerSubmitted = true
-      
       nextAndSubmitButton.alpha = 0
       isFirstLoad = true
+      keyboardCollectionView.isUserInteractionEnabled = false
+      keyboardView.isUserInteractionEnabled = false
+      checkAnswer()
+      
       CATransaction.begin()
       CATransaction.setCompletionBlock {
         self.isFirstLoad = false
@@ -597,10 +603,6 @@ class ViewController: UIViewController {
       }
       definitionCollectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
       CATransaction.commit()
-      
-      keyboardCollectionView.isUserInteractionEnabled = false
-      keyboardView.isUserInteractionEnabled = false
-      checkAnswer()
     } else {
       index += 1
       answerSubmitted = false
@@ -609,26 +611,24 @@ class ViewController: UIViewController {
       partOfSpeech.removeAll()
       guessLabel.text?.removeAll()
       fetchWordAPI(with: country) { (successful) in
-        self.isFromSpeechService = !successful
-        if !successful {
-          self.word = Word(text: self.words[self.index], definition: [:], audio: nil)
+        DispatchQueue.main.async { [weak self] in
+          if !successful {
+            self?.word = Word(text: self!.words[self!.index], definition: [:], audio: nil)
+          }
+          self?.isFromSpeechService = !successful
+          self?.changeUIStateAfterFetch(true)
+          self?.definitionCollectionView.reloadData()
+          self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
+          self?.keyboardCollectionView.isUserInteractionEnabled = true
+          
+          if self!.keyboardOption != .keyboard { self?.keyboardCollectionView.reloadData() }
         }
-        self.changeUIStateAfterFetch(true)
-        self.definitionCollectionView.reloadData()
-        self.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
-        self.keyboardCollectionView.isUserInteractionEnabled = true
-        
-        if (!self.isPreviousFetchSuccessful && self.keyboardOption == .keyboard) ||
-            (self.keyboardOption != .keyboard || !successful)
-        { self.keyboardCollectionView.reloadData() }
-        self.isPreviousFetchSuccessful = successful
       }
     }
   }
   
   private func checkAnswer() {
     guard let text = word?.text else { return }
-    
     
     if text == guessLabel.text { print(true) }
     else { print(false) }
@@ -674,12 +674,12 @@ class ViewController: UIViewController {
     }
     country.toggle()
     changeLanguage()
+    didChangeDiction = true
     guard !isFromSpeechService else {
       changeUIStateAfterFetch(true)
       return
     }
     fetchWordAPI(with: country) { [weak self] (successful) in
-      self?.didChangeDiction = true
       //some words don't have both diction available
       if successful { self?.changeUIStateAfterFetch(successful) }
     }
@@ -694,15 +694,15 @@ class ViewController: UIViewController {
           completion(false)
           print(error.localizedDescription)
         case .success(let word):
-          if let word = word.first {
+          if let item = word.first {
             var definition = [String: String]()
-            for meaning in word.meanings {
+            for meaning in item.meanings {
               if let definitionAPI = meaning.definitions.first?.definition {
                 definition.updateValue(definitionAPI, forKey: meaning.partOfSpeech)
               }
             }
-            if let audio = word.phonetics.first?.audio {
-              self?.word = Word(text: word.word.replacingOccurrences(of: "-", with: ""),
+            if let audio = item.phonetics.first?.audio {
+              self?.word = Word(text: item.word.replacingOccurrences(of: "-", with: "").lowercased(),
                                 definition: definition,
                                 audio: audio)
               //              print(self!.word)
@@ -852,7 +852,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 extension ViewController: KeyboardCollectionViewCellDelegate {
   func keyPressed(for key: String) {
     
-    guard let text = self.word?.text else { return }
+    guard let text = word?.text else { return }
     let word: String = {
       guard let text = guessLabel.text else { return "" }
       if key.count == 1 { return text + key }
@@ -860,11 +860,11 @@ extension ViewController: KeyboardCollectionViewCellDelegate {
       else { return "" }
     }()
     
-    UIView.animate(withDuration: 0.30) {
-      self.guessLabel.text = word.count > 22 ? "" : word
-      self.nextAndSubmitButton.isHidden = word.count < Int(floor(Float(text.count) * 0.90))
-      self.nextAndSubmitButton.alpha = self.nextAndSubmitButton.isHidden ? 0 : 1
-      self.view.layoutIfNeeded()
+    UIView.animate(withDuration: 0.30) { [weak self] in
+      self?.guessLabel.text = word.count > 22 ? "" : word
+      self?.nextAndSubmitButton.isHidden = word.count < Int(floor(Float(text.count) * 0.90))
+      self?.nextAndSubmitButton.alpha = self!.nextAndSubmitButton.isHidden ? 0 : 1
+      self?.view.layoutIfNeeded()
     }
   }
   
