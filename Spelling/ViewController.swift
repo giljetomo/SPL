@@ -8,8 +8,12 @@
 import UIKit
 import Foundation
 import AVFoundation
+import CoreData
 
 class ViewController: UIViewController {
+  
+  var container: NSPersistentContainer? = AppDelegate.persistentContainer
+  var fetchedWord: String?
   
   //tracking the display of correct word in the collection view to be followed by heartImage
   var isFirstLoad = true
@@ -38,7 +42,7 @@ class ViewController: UIViewController {
   var country: Country = .US
   var partOfSpeech = [String]()
   //temp var
-  let words = ["abactinal","aaronic","panacea","aeromechanic","abactinal","uncommunicativeness","abolitionary","panacea","behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
+  let words = ["antiauthoritarian","anachronistically","abactinal","aaronic","panacea","aeromechanic","abactinal","uncommunicativeness","abolitionary","panacea","behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
   //temp var
   var index = 0
   
@@ -100,7 +104,7 @@ class ViewController: UIViewController {
     return lbl
   }()
   let levelLabel: UILabel = {
-    let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 5, right: 5)
+    let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 8, right: 8)
     lbl.translatesAutoresizingMaskIntoConstraints = false
     lbl.text = Level.TRAVELLER.rawValue
     lbl.font = .systemFont(ofSize: 16)
@@ -238,15 +242,27 @@ class ViewController: UIViewController {
     return btn
   }()
   
+  private func isRandomWordFetchSuccessful() -> Bool {
+    guard let context = container?.viewContext else { return false }
+    fetchedWord = try? ManagedWord.fetchWord(in: context)
+    return fetchedWord != nil
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = UIColor(named: "White")
     
+//    if let context = container?.viewContext {
+//      ManagedWord.preloadData(in: context)
+//    }
+
+    guard isRandomWordFetchSuccessful(), let text = fetchedWord else { return }
+    print(text)
     fetchWordAPI(with: country) {(successful) in
       DispatchQueue.main.async { [weak self] in
         self?.isFromSpeechService = !successful
         if !successful {
-          self?.word = Word(text: self!.words[self!.index], definition: [:], audio: nil)
+          self?.word = Word(text: text, definition: [:], audio: nil)
         }
         self?.definitionCollectionView.delegate = self
         self?.definitionCollectionView.dataSource = self
@@ -259,6 +275,7 @@ class ViewController: UIViewController {
         UIView.animate(withDuration: 0.50) { [weak self] in
           self?.definitionCollectionView.reloadData()
           self?.keyboardCollectionView.reloadData()
+          self?.keyboardCollectionView.isScrollEnabled = false
         }
       }
     }
@@ -368,14 +385,14 @@ class ViewController: UIViewController {
     dictionView.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
     
     dictionView.addSubview(dictionHStackView)
-    dictionHStackView.widthAnchor.constraint(equalTo: dictionView.widthAnchor, multiplier: 0.90).isActive = true
-    dictionHStackView.heightAnchor.constraint(equalTo: dictionView.heightAnchor, multiplier: 0.90).isActive = true
+    dictionHStackView.widthAnchor.constraint(equalTo: dictionView.widthAnchor).isActive = true
+    dictionHStackView.heightAnchor.constraint(equalTo: dictionView.heightAnchor).isActive = true
     dictionHStackView.centerYAnchor.constraint(equalTo: dictionView.centerYAnchor).isActive = true
-    dictionHStackView.centerXAnchor.constraint(equalTo: dictionView.centerXAnchor).isActive = true
     
     topView.addSubview(levelLabel)
     levelLabel.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -8).isActive = true
     levelLabel.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
+    levelLabel.heightAnchor.constraint(equalTo: dictionView.heightAnchor).isActive = true
     
     topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
     topView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.95).isActive = true
@@ -610,10 +627,14 @@ class ViewController: UIViewController {
       didChangeDiction = false
       partOfSpeech.removeAll()
       guessLabel.text?.removeAll()
+      
+      guard isRandomWordFetchSuccessful(), let text = fetchedWord else { return }
+      print(text)
+      
       fetchWordAPI(with: country) { (successful) in
         DispatchQueue.main.async { [weak self] in
           if !successful {
-            self?.word = Word(text: self!.words[self!.index], definition: [:], audio: nil)
+            self?.word = Word(text: text, definition: [:], audio: nil)
           }
           self?.isFromSpeechService = !successful
           self?.changeUIStateAfterFetch(true)
@@ -687,7 +708,8 @@ class ViewController: UIViewController {
   }
   
   fileprivate func fetchWordAPI(with country: Country, completion: @escaping (Bool) -> Void) {
-    WordInfoAPI.shared.fetchWordInfoAPI(word: words[index], country: country) { (result) in
+    guard let text = fetchedWord else { return }
+    WordInfoAPI.shared.fetchWordInfoAPI(word: text, country: country) { (result) in
       DispatchQueue.main.async { [weak self] in
         switch result {
         case .failure(let error):
@@ -701,11 +723,15 @@ class ViewController: UIViewController {
                 definition.updateValue(definitionAPI, forKey: meaning.partOfSpeech)
               }
             }
+            print("fetched from API \(item.word)")
+            guard let text = self?.fetchedWord, text == item.word.lowercased() else {
+              completion(false)
+              return
+            }
             if let audio = item.phonetics.first?.audio {
               self?.word = Word(text: item.word.replacingOccurrences(of: "-", with: "").lowercased(),
                                 definition: definition,
                                 audio: audio)
-              //              print(self!.word)
               self?.initPlayer()
               completion(true)
             } else {
@@ -862,7 +888,7 @@ extension ViewController: KeyboardCollectionViewCellDelegate {
     
     UIView.animate(withDuration: 0.30) { [weak self] in
       self?.guessLabel.text = word.count > 22 ? "" : word
-      self?.nextAndSubmitButton.isHidden = word.count < Int(floor(Float(text.count) * 0.90))
+      self?.nextAndSubmitButton.isHidden = word.count < 1//Int(floor(Float(text.count) * 0.90))
       self?.nextAndSubmitButton.alpha = self!.nextAndSubmitButton.isHidden ? 0 : 1
       self?.view.layoutIfNeeded()
     }
