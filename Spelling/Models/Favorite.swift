@@ -2,7 +2,7 @@
 //  Favorite.swift
 //  Spelling
 //
-//  Created by Macbook Pro on 2021-07-09.
+//  Created by Gil Jetomo on 2021-07-09.
 //
 
 import Foundation

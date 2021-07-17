@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		5244D0CC2682650400BFAF6B /* AnimationUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0CB2682650400BFAF6B /* AnimationUtility.swift */; };
 		5244D0D4268667FF00BFAF6B /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D3268667FF00BFAF6B /* Keyboard.swift */; };
-		5244D0D826866D3000BFAF6B /* UIButton+HighlightedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */; };
 		5244D0D926866D3000BFAF6B /* KeyboardCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */; };
 		524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */; };
 		524CFE23269915CE00510D2F /* Favorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CFE22269915CD00510D2F /* Favorite.swift */; };
@@ -31,12 +30,13 @@
 		52ACA060267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */; };
 		52ACA066267D210900E1F86A /* UILabel+boldRegularText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */; };
 		52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D50269E78A9000F6006 /* SpeechService.swift */; };
+		52D55D5826A12F99000F6006 /* ManagedWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5726A12F99000F6006 /* ManagedWord.swift */; };
+		52D55D5D26A1301D000F6006 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5C26A1301D000F6006 /* Status.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		5244D0CB2682650400BFAF6B /* AnimationUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationUtility.swift; sourceTree = "<group>"; };
 		5244D0D3268667FF00BFAF6B /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
-		5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+HighlightedButton.swift"; sourceTree = "<group>"; };
 		5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardCollectionViewCell.swift; sourceTree = "<group>"; };
 		524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCollectionViewCell.swift; sourceTree = "<group>"; };
 		524CFE22269915CD00510D2F /* Favorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Favorite.swift; sourceTree = "<group>"; };
@@ -60,6 +60,8 @@
 		52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionCollectionViewCell.swift; sourceTree = "<group>"; };
 		52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+boldRegularText.swift"; sourceTree = "<group>"; };
 		52D55D50269E78A9000F6006 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
+		52D55D5726A12F99000F6006 /* ManagedWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedWord.swift; sourceTree = "<group>"; };
+		52D55D5C26A1301D000F6006 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 				524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */,
 				52ACA068267D213D00E1F86A /* Utils */,
 				52ACA0292678316A00E1F86A /* Info.plist */,
+				52D55D5A26A12F9F000F6006 /* CoreData */,
 			);
 			path = Spelling;
 			sourceTree = "<group>";
@@ -136,13 +139,21 @@
 		52ACA068267D213D00E1F86A /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				5244D0D626866D3000BFAF6B /* UIButton+HighlightedButton.swift */,
 				52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */,
 				5244D0CB2682650400BFAF6B /* AnimationUtility.swift */,
 				52ACA05A267BBEB900E1F86A /* UIPaddedLabel.swift */,
 				52ACA04E267961C700E1F86A /* Notification+Names.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		52D55D5A26A12F9F000F6006 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				52D55D5726A12F99000F6006 /* ManagedWord.swift */,
+				52D55D5C26A1301D000F6006 /* Status.swift */,
+			);
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -215,13 +226,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				52ACA05B267BBEB900E1F86A /* UIPaddedLabel.swift in Sources */,
+				52D55D5826A12F99000F6006 /* ManagedWord.swift in Sources */,
 				52ACA03B267837BE00E1F86A /* Endpoint.swift in Sources */,
 				52ACA04F267961C700E1F86A /* Notification+Names.swift in Sources */,
 				52ACA01D2678316400E1F86A /* ViewController.swift in Sources */,
 				52ACA04326783CFC00E1F86A /* Word.swift in Sources */,
 				5244D0CC2682650400BFAF6B /* AnimationUtility.swift in Sources */,
 				524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */,
-				5244D0D826866D3000BFAF6B /* UIButton+HighlightedButton.swift in Sources */,
 				52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */,
 				52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */,
 				52ACA0382678367300E1F86A /* WordInfoAPI.swift in Sources */,
@@ -231,6 +242,7 @@
 				52ACA066267D210900E1F86A /* UILabel+boldRegularText.swift in Sources */,
 				52ACA03E267837F300E1F86A /* Language.swift in Sources */,
 				524CFE23269915CE00510D2F /* Favorite.swift in Sources */,
+				52D55D5D26A1301D000F6006 /* Status.swift in Sources */,
 				52ACA04C26794A6B00E1F86A /* AudioPlayer.swift in Sources */,
 				5244D0D4268667FF00BFAF6B /* Keyboard.swift in Sources */,
 				52ACA01B2678316400E1F86A /* SceneDelegate.swift in Sources */,

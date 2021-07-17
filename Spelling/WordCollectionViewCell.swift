@@ -62,14 +62,16 @@ class WordCollectionViewCell: UICollectionViewCell {
     view.addSubview(wordLabel)
     wordLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     wordLabel.trailingAnchor.constraint(equalTo: heartImageView.leadingAnchor, constant: -5).isActive = true
-    wordLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: heartImageView.intrinsicContentSize.width).isActive = true
+    wordLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: heartImageView.intrinsicContentSize.width + 5).isActive = true
+    wordLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+    wordLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     
     contentView.addSubview(view)
     //  constraints need to be applied so the button does not overflow outside the contentView
-    view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5).isActive = true
-    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: 0).isActive = true
-    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-    view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
+    view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+    view.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
     contentView.layer.cornerRadius = 5
   }
   required init?(coder: NSCoder) {
