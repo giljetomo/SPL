@@ -14,6 +14,7 @@ class ViewController: UIViewController {
   
   var container: NSPersistentContainer? = AppDelegate.persistentContainer
   var fetchedWord: String?
+  var level: Level = .IMMIGRANT
   
   //tracking the display of correct word in the collection view to be followed by heartImage
   var isFirstLoad = true
@@ -41,10 +42,6 @@ class ViewController: UIViewController {
   }
   var country: Country = .US
   var partOfSpeech = [String]()
-  //temp var
-  let words = ["antiauthoritarian","anachronistically","abactinal","aaronic","panacea","aeromechanic","abactinal","uncommunicativeness","abolitionary","panacea","behavior","right","right","sir","pseudoscientific","uncommunicativeness","diagrammatically","quandary","wind","uncopyrightable","counterintuitive","acanthopterygian","panegyric","chez","pseudoscientific","diagrammatically","misunderstanding","hakenkreuzler","haecceity","behavior","abhorring","abracadabra","obstreperosity","abfarads","aasvogel","aargh","aaronical","equivalents","equivocated","opprobrium","ggg","clandestine","right","right","sir","pair","quixotic","right","above","apocryphal","sesquipedalian","hello","asdfadsf","fabulous","mother","sdfsd","hero","sdss","example","handkerchief", "sir", "right", "hello", "obstreperous", "caa", "finish", "pair", "occur"]
-  //temp var
-  var index = 0
   
   let topView: UIView = {
     let v = UIView()
@@ -103,10 +100,10 @@ class ViewController: UIViewController {
     lbl.setContentCompressionResistancePriority(.required, for: .horizontal)
     return lbl
   }()
-  let levelLabel: UILabel = {
+  lazy var levelLabel: UILabel = {
     let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 8, right: 8)
     lbl.translatesAutoresizingMaskIntoConstraints = false
-    lbl.text = Level.TRAVELLER.rawValue
+    lbl.text = self.level.rawValue
     lbl.font = .systemFont(ofSize: 16)
     lbl.layer.masksToBounds = true
     lbl.layer.cornerRadius = 5
@@ -244,7 +241,7 @@ class ViewController: UIViewController {
   
   private func isRandomWordFetchSuccessful() -> Bool {
     guard let context = container?.viewContext else { return false }
-    fetchedWord = try? ManagedWord.fetchWord(in: context)
+    fetchedWord = try? ManagedWord.fetchWord(with: level, in: context)
     return fetchedWord != nil
   }
   
@@ -621,7 +618,6 @@ class ViewController: UIViewController {
       definitionCollectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
       CATransaction.commit()
     } else {
-      index += 1
       answerSubmitted = false
       isLiked = false
       didChangeDiction = false

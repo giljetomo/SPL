@@ -10,15 +10,21 @@ import CoreData
 
 class ManagedWord: NSManagedObject {
   
-  class func fetchWord(in context: NSManagedObjectContext) throws -> String? {
+  class func fetchWord(with level: Level, in context: NSManagedObjectContext) throws -> String? {
+    let lowerbound = level.range.lowerBound
+    let upperbound = level.range.upperBound
     let request: NSFetchRequest<ManagedWord> = ManagedWord.fetchRequest()
     let notSpelledPredicate = NSPredicate(format: "status != 1")
-    request.predicate = notSpelledPredicate
+    let textLengthPredicate = NSPredicate(format: "text MATCHES %@", ".{\(lowerbound),\(upperbound)}")
+    let andPredicates = NSCompoundPredicate(type: .and, subpredicates: [notSpelledPredicate, textLengthPredicate])
+    request.predicate = andPredicates
     do {
       let words = try context.fetch(request)
       guard words.count > 0 else { return nil }
       let count = UInt32(words.count)
       let i = Int(arc4random_uniform(count))
+      let word = words[i]
+      print(word.text, word.firstLetter, word.isFavorite, word.state)
       return words[i].text
     } catch {
       print(error)
