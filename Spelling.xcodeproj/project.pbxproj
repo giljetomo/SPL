@@ -32,6 +32,9 @@
 		52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D50269E78A9000F6006 /* SpeechService.swift */; };
 		52D55D5826A12F99000F6006 /* ManagedWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5726A12F99000F6006 /* ManagedWord.swift */; };
 		52D55D5D26A1301D000F6006 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5C26A1301D000F6006 /* Status.swift */; };
+		52D55D6826A3BD15000F6006 /* Spelling.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 52D55D6526A3BD14000F6006 /* Spelling.sqlite */; };
+		52D55D6926A3BD15000F6006 /* Spelling.sqlite-shm in Resources */ = {isa = PBXBuildFile; fileRef = 52D55D6626A3BD14000F6006 /* Spelling.sqlite-shm */; };
+		52D55D6A26A3BD15000F6006 /* Spelling.sqlite-wal in Resources */ = {isa = PBXBuildFile; fileRef = 52D55D6726A3BD15000F6006 /* Spelling.sqlite-wal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +65,9 @@
 		52D55D50269E78A9000F6006 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		52D55D5726A12F99000F6006 /* ManagedWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedWord.swift; sourceTree = "<group>"; };
 		52D55D5C26A1301D000F6006 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
+		52D55D6526A3BD14000F6006 /* Spelling.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = Spelling.sqlite; sourceTree = "<group>"; };
+		52D55D6626A3BD14000F6006 /* Spelling.sqlite-shm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Spelling.sqlite-shm"; sourceTree = "<group>"; };
+		52D55D6726A3BD15000F6006 /* Spelling.sqlite-wal */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Spelling.sqlite-wal"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +100,7 @@
 		52ACA0172678316400E1F86A /* Spelling */ = {
 			isa = PBXGroup;
 			children = (
+				52D55D6C26A3BD20000F6006 /* SQLite */,
 				52ACA0402678387E00E1F86A /* Models */,
 				52ACA05D267BE15C00E1F86A /* Supporting Files */,
 				52ACA01C2678316400E1F86A /* ViewController.swift */,
@@ -156,6 +163,16 @@
 			path = CoreData;
 			sourceTree = "<group>";
 		};
+		52D55D6C26A3BD20000F6006 /* SQLite */ = {
+			isa = PBXGroup;
+			children = (
+				52D55D6526A3BD14000F6006 /* Spelling.sqlite */,
+				52D55D6626A3BD14000F6006 /* Spelling.sqlite-shm */,
+				52D55D6726A3BD15000F6006 /* Spelling.sqlite-wal */,
+			);
+			path = SQLite;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -215,6 +232,9 @@
 			files = (
 				52ACA0282678316A00E1F86A /* LaunchScreen.storyboard in Resources */,
 				52ACA0252678316A00E1F86A /* Assets.xcassets in Resources */,
+				52D55D6926A3BD15000F6006 /* Spelling.sqlite-shm in Resources */,
+				52D55D6826A3BD15000F6006 /* Spelling.sqlite in Resources */,
+				52D55D6A26A3BD15000F6006 /* Spelling.sqlite-wal in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
