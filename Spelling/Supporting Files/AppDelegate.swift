@@ -40,12 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if isFirstLaunch { userDefaults.setValue(true, forKey: isFirstLaunchKey) }
     return isFirstLaunch
   }
-  private func getDocumentsDirectory() -> URL {
-    let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
-    let documentsDirectory = paths[0]
-    return documentsDirectory
-  }
-  
+
   lazy var persistentContainer: NSPersistentContainer = {
     let container = NSPersistentContainer(name: "Spelling")
     

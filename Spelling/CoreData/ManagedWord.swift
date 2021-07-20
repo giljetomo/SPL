@@ -10,7 +10,21 @@ import CoreData
 
 class ManagedWord: NSManagedObject {
   
-  class func fetchWord(with level: Level, in context: NSManagedObjectContext) throws -> String? {
+  class func findWord(_ text: String, in context: NSManagedObjectContext) throws -> ManagedWord? {
+    let request: NSFetchRequest<ManagedWord> = ManagedWord.fetchRequest()
+    let predicate = NSPredicate(format: "text LIKE[c] %@", text)
+    request.predicate = predicate
+    do {
+      let words = try context.fetch(request)
+      assert(words.count == 1, "ManagedWord.findWord: Database inconsistency")
+      return words.first
+    } catch {
+      print(error.localizedDescription)
+    }
+    return nil
+  }
+  
+  class func fetchRandomWord(with level: Level, in context: NSManagedObjectContext) throws -> ManagedWord? {
     let lowerbound = level.range.lowerBound
     let upperbound = level.range.upperBound
     let request: NSFetchRequest<ManagedWord> = ManagedWord.fetchRequest()
@@ -25,7 +39,7 @@ class ManagedWord: NSManagedObject {
       let i = Int(arc4random_uniform(count))
       let word = words[i]
       print(word.text, word.firstLetter, word.isFavorite, word.state)
-      return words[i].text
+      return word
     } catch {
       print(error)
       throw error

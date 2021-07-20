@@ -13,8 +13,8 @@ import CoreData
 class ViewController: UIViewController {
   
   var container: NSPersistentContainer? = AppDelegate.persistentContainer
-  var fetchedWord: String?
-  var level: Level = .IMMIGRANT
+  var fetchedWord: ManagedWord?
+  var level: Level = .traveller
   
   //tracking the display of correct word in the collection view to be followed by heartImage
   var isFirstLoad = true
@@ -28,6 +28,7 @@ class ViewController: UIViewController {
   var concealedWord = [[String]]()
   var word: Word? {
     didSet {
+      guard !didChangeDiction else { return }
       guard let word = self.word else {
         shuffledWord = [[String]](repeating: [String](), count: 3)
         concealedWord = [[String]](repeating: [String](), count: 3)
@@ -41,6 +42,7 @@ class ViewController: UIViewController {
     }
   }
   var country: Country = .US
+  var definition = [String: String]()
   var partOfSpeech = [String]()
   
   let topView: UIView = {
@@ -103,7 +105,7 @@ class ViewController: UIViewController {
   lazy var levelLabel: UILabel = {
     let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 8, right: 8)
     lbl.translatesAutoresizingMaskIntoConstraints = false
-    lbl.text = self.level.rawValue
+    lbl.text = self.level.rawValue.uppercased()
     lbl.font = .systemFont(ofSize: 16)
     lbl.layer.masksToBounds = true
     lbl.layer.cornerRadius = 5
@@ -238,28 +240,50 @@ class ViewController: UIViewController {
     btn.addTarget(self, action: #selector(fetchNextWord(_:)), for: .touchUpInside)
     return btn
   }()
+  lazy var profileTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewProfile))
+  let profileImageView: UIImageView = {
+    let iv = UIImageView()
+    iv.translatesAutoresizingMaskIntoConstraints = false
+    iv.contentMode = .scaleAspectFit
+    iv.image = UIImage(named: "profile")
+    iv.tintColor = .black
+    iv.isUserInteractionEnabled = true
+    return iv
+  }()
   
   private func isRandomWordFetchSuccessful() -> Bool {
     guard let context = container?.viewContext else { return false }
-    fetchedWord = try? ManagedWord.fetchWord(with: level, in: context)
+    fetchedWord = try? ManagedWord.fetchRandomWord(with: level, in: context)
     return fetchedWord != nil
+  }
+  
+  @objc func viewProfile() {
+    UIView.animate(withDuration: 0.20) { [weak self] in
+      self?.profileImageView.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+    } completion: { (_) in
+      UIView.animate(withDuration: 0.10) { [weak self] in
+        self?.profileImageView.transform = .identity
+      } completion: { [weak self] (_) in
+        self?.present(UINavigationController(rootViewController: ProfileTableViewController()), animated: true, completion: nil)
+      }
+    }
   }
   
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = UIColor(named: "White")
     
-//    if let context = container?.viewContext {
-//      ManagedWord.preloadData(in: context)
-//    }
-
-    guard isRandomWordFetchSuccessful(), let text = fetchedWord else { return }
+    //    if let context = container?.viewContext {
+    //      ManagedWord.preloadData(in: context)
+    //    }
+    
+    guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
     print(text)
     fetchWordAPI(with: country) {(successful) in
       DispatchQueue.main.async { [weak self] in
         self?.isFromSpeechService = !successful
         if !successful {
-          self?.word = Word(text: text, definition: [:], audio: nil)
+          self?.word = Word(text: text, definition: self!.definition, audio: nil)
         }
         self?.definitionCollectionView.delegate = self
         self?.definitionCollectionView.dataSource = self
@@ -361,6 +385,7 @@ class ViewController: UIViewController {
     view.addSubview(guessLabelView)
     view.addSubview(nextAndSubmitButton)
     view.addSubview(keyboardSectionView)
+    view.addSubview(profileImageView)
     view.addSubview(foregroundView)
     view.addSubview(keyboardView)
     
@@ -376,6 +401,7 @@ class ViewController: UIViewController {
     topView.addConstraint(dictionViewWidthConstraint)
     languageLabel.addGestureRecognizer(dictionTapRecognizer)
     audioImageView.addGestureRecognizer(playTapRecognizer)
+    profileImageView.addGestureRecognizer(profileTapRecognizer)
     
     dictionView.heightAnchor.constraint(equalTo: topView.heightAnchor, multiplier: 0.80).isActive = true
     dictionView.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 8).isActive = true
@@ -458,6 +484,12 @@ class ViewController: UIViewController {
     
     nextAndSubmitButton.topAnchor.constraint(equalTo: keyboardSectionView.bottomAnchor, constant: 20).isActive = true
     nextAndSubmitButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
+    
+    profileImageView.leadingAnchor.constraint(equalTo: dictionView.leadingAnchor).isActive = true
+    profileImageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+    profileImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.04).isActive = true
+    profileImageView.widthAnchor.constraint(equalTo: profileImageView.heightAnchor, multiplier: 1).isActive = true
+    
   }
   
   func initPlayer() {
@@ -560,7 +592,7 @@ class ViewController: UIViewController {
     audioImageView.isUserInteractionEnabled = !isAudioMuted
     keyboardView.isUserInteractionEnabled = !answerSubmitted
     setPlayImageViewColor()
-   
+    
     if volumeSlider.value > 0.0 { playAudio() }
     
     guard !didChangeDiction else { return }
@@ -584,6 +616,11 @@ class ViewController: UIViewController {
         self?.audioImageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
       }
     }
+    guard !answerSubmitted else { return }
+    
+    dictionView.isUserInteractionEnabled.toggle()
+    keyboardView.isUserInteractionEnabled.toggle()
+    keyboardCollectionView.isUserInteractionEnabled.toggle()
   }
   
   fileprivate func setPlayImageViewColor() {
@@ -597,7 +634,6 @@ class ViewController: UIViewController {
       isFirstLoad = true
       keyboardCollectionView.isUserInteractionEnabled = false
       keyboardView.isUserInteractionEnabled = false
-      checkAnswer()
       
       CATransaction.begin()
       CATransaction.setCompletionBlock {
@@ -605,10 +641,17 @@ class ViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) { [weak self] in
           CATransaction.begin()
           CATransaction.setCompletionBlock {
-            UIView.transition(with: self!.nextAndSubmitButton, duration: 1.0, options: .transitionCrossDissolve) {
-              self?.nextAndSubmitButton.setTitle("Next", for: .normal)
-              self?.nextAndSubmitButton.alpha = 1
+            CATransaction.begin()
+            CATransaction.setCompletionBlock {
+              DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
+                UIView.transition(with: self!.nextAndSubmitButton, duration: 1.0, options: .transitionCrossDissolve) {
+                  self?.nextAndSubmitButton.setTitle("Next", for: .normal)
+                  self?.nextAndSubmitButton.alpha = 1
+                }
+              }
             }
+            self?.checkAnswer()
+            CATransaction.commit()
           }
           self?.definitionCollectionView.reloadItems(at: [IndexPath(item: 0, section: 0)])
           self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
@@ -618,25 +661,25 @@ class ViewController: UIViewController {
       definitionCollectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
       CATransaction.commit()
     } else {
+      keyboardCollectionView.isUserInteractionEnabled = true
       answerSubmitted = false
       isLiked = false
       didChangeDiction = false
       partOfSpeech.removeAll()
       guessLabel.text?.removeAll()
       
-      guard isRandomWordFetchSuccessful(), let text = fetchedWord else { return }
+      guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
       print(text)
       
       fetchWordAPI(with: country) { (successful) in
         DispatchQueue.main.async { [weak self] in
           if !successful {
-            self?.word = Word(text: text, definition: [:], audio: nil)
+            self?.word = Word(text: text, definition: self!.definition, audio: nil)
           }
           self?.isFromSpeechService = !successful
           self?.changeUIStateAfterFetch(true)
           self?.definitionCollectionView.reloadData()
           self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
-          self?.keyboardCollectionView.isUserInteractionEnabled = true
           
           if self!.keyboardOption != .keyboard { self?.keyboardCollectionView.reloadData() }
         }
@@ -645,10 +688,41 @@ class ViewController: UIViewController {
   }
   
   private func checkAnswer() {
-    guard let text = word?.text else { return }
+    //frc deletes the entry from the tableview if the state update is performed in the background thread.
+    guard let text = fetchedWord?.text, let context = container?.viewContext else { return }
+    let isCorrect = text == guessLabel.text
     
-    if text == guessLabel.text { print(true) }
-    else { print(false) }
+    if isCorrect {
+      UIView.transition(with: guessLabel, duration: 0.8, options: .transitionFlipFromTop) { [weak self] in
+        UIView.animate(withDuration: 0.10) {
+          self?.guessLabel.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+        } completion: { (_) in
+          UIView.animate(withDuration: 0.20) {
+            self?.guessLabel.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+          } completion: { (_) in
+            UIView.animate(withDuration: 0.5) {
+              self?.guessLabel.transform = .identity
+            }
+          }
+        }
+      }
+    } else {
+      DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) { [unowned self] in
+        let animation = CABasicAnimation(keyPath: "position")
+        animation.duration = 0.05
+        animation.repeatCount = 4
+        animation.autoreverses = true
+        animation.fromValue = NSValue(cgPoint: CGPoint(x: self.guessLabel.center.x - 12, y: self.guessLabel.center.y))
+        animation.toValue = NSValue(cgPoint: CGPoint(x: self.guessLabel.center.x + 12, y: self.guessLabel.center.y))
+        self.guessLabel.layer.add(animation, forKey: "position")
+      }
+    }
+    
+    context.perform {
+      let word = try? ManagedWord.findWord(text, in: context)
+      word?.state = isCorrect ? .spelled : .misspelled
+    }
+    try? context.save()
   }
   
   @objc func changeLanguage() {
@@ -704,29 +778,32 @@ class ViewController: UIViewController {
   }
   
   fileprivate func fetchWordAPI(with country: Country, completion: @escaping (Bool) -> Void) {
-    guard let text = fetchedWord else { return }
+    guard let text = fetchedWord?.text else { return }
     WordInfoAPI.shared.fetchWordInfoAPI(word: text, country: country) { (result) in
       DispatchQueue.main.async { [weak self] in
+        self?.definition.removeAll()
+        
         switch result {
         case .failure(let error):
           completion(false)
           print(error.localizedDescription)
         case .success(let word):
           if let item = word.first {
-            var definition = [String: String]()
+            //            var definition = [String: String]()
             for meaning in item.meanings {
               if let definitionAPI = meaning.definitions.first?.definition {
-                definition.updateValue(definitionAPI, forKey: meaning.partOfSpeech)
+                self?.definition.updateValue(definitionAPI, forKey: meaning.partOfSpeech)
               }
             }
             print("fetched from API \(item.word)")
-            guard let text = self?.fetchedWord, text == item.word.lowercased() else {
+            
+            guard let text = self?.fetchedWord?.text, text == item.word.lowercased() else {
               completion(false)
               return
             }
             if let audio = item.phonetics.first?.audio {
               self?.word = Word(text: item.word.replacingOccurrences(of: "-", with: "").lowercased(),
-                                definition: definition,
+                                definition: self!.definition,
                                 audio: audio)
               self?.initPlayer()
               completion(true)

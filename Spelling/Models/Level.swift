@@ -8,17 +8,17 @@
 import Foundation
 
 enum Level: String {
-  case TRAVELLER //61,553
-  case IMMIGRANT //58,055
-  case CITIZEN //56,199
-  case PRESIDENT //16,906
+  case traveller //61,553
+  case immigrant //58,055
+  case citizen //56,199
+  case president //16,906
   
   var range: CountableClosedRange<Int32> {
     switch self {
-    case .TRAVELLER: return 4...7
-    case .IMMIGRANT: return 8...9
-    case .CITIZEN: return 10...12
-    case .PRESIDENT: return 13...21
+    case .traveller: return 4...7
+    case .immigrant: return 8...9
+    case .citizen: return 10...12
+    case .president: return 13...21
     }
   }
 }
