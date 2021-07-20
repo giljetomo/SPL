@@ -32,6 +32,14 @@
 		52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D50269E78A9000F6006 /* SpeechService.swift */; };
 		52D55D5826A12F99000F6006 /* ManagedWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5726A12F99000F6006 /* ManagedWord.swift */; };
 		52D55D5D26A1301D000F6006 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5C26A1301D000F6006 /* Status.swift */; };
+		52D55D8A26A3DA5F000F6006 /* Spelling.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 52D55D8726A3DA5F000F6006 /* Spelling.sqlite */; };
+		52D55D8B26A3DA5F000F6006 /* Spelling.sqlite-shm in Resources */ = {isa = PBXBuildFile; fileRef = 52D55D8826A3DA5F000F6006 /* Spelling.sqlite-shm */; };
+		52D55D8C26A3DA5F000F6006 /* Spelling.sqlite-wal in Resources */ = {isa = PBXBuildFile; fileRef = 52D55D8926A3DA5F000F6006 /* Spelling.sqlite-wal */; };
+		52D55D9626A638EF000F6006 /* ProfileTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D9526A638EF000F6006 /* ProfileTableViewController.swift */; };
+		52D55D9926A67BB9000F6006 /* WordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D9826A67BB7000F6006 /* WordTableViewCell.swift */; };
+		52D55D9C26A67E78000F6006 /* FetchedResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D9B26A67E78000F6006 /* FetchedResultsTableViewController.swift */; };
+		52D55D9F26A6B4ED000F6006 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D9E26A6B4ED000F6006 /* Filter.swift */; };
+		52D55DA226A75491000F6006 /* HeartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55DA126A75490000F6006 /* HeartButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +70,14 @@
 		52D55D50269E78A9000F6006 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		52D55D5726A12F99000F6006 /* ManagedWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedWord.swift; sourceTree = "<group>"; };
 		52D55D5C26A1301D000F6006 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
+		52D55D8726A3DA5F000F6006 /* Spelling.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = Spelling.sqlite; sourceTree = "<group>"; };
+		52D55D8826A3DA5F000F6006 /* Spelling.sqlite-shm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Spelling.sqlite-shm"; sourceTree = "<group>"; };
+		52D55D8926A3DA5F000F6006 /* Spelling.sqlite-wal */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Spelling.sqlite-wal"; sourceTree = "<group>"; };
+		52D55D9526A638EF000F6006 /* ProfileTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTableViewController.swift; sourceTree = "<group>"; };
+		52D55D9826A67BB7000F6006 /* WordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewCell.swift; sourceTree = "<group>"; };
+		52D55D9B26A67E78000F6006 /* FetchedResultsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsTableViewController.swift; sourceTree = "<group>"; };
+		52D55D9E26A6B4ED000F6006 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
+		52D55DA126A75490000F6006 /* HeartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,12 +110,15 @@
 		52ACA0172678316400E1F86A /* Spelling */ = {
 			isa = PBXGroup;
 			children = (
+				52D55D7226A3D0C0000F6006 /* SQLite */,
 				52ACA0402678387E00E1F86A /* Models */,
 				52ACA05D267BE15C00E1F86A /* Supporting Files */,
 				52ACA01C2678316400E1F86A /* ViewController.swift */,
 				5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */,
+				52D55D9526A638EF000F6006 /* ProfileTableViewController.swift */,
 				52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */,
 				524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */,
+				52D55D9826A67BB7000F6006 /* WordTableViewCell.swift */,
 				52ACA068267D213D00E1F86A /* Utils */,
 				52ACA0292678316A00E1F86A /* Info.plist */,
 				52D55D5A26A12F9F000F6006 /* CoreData */,
@@ -118,6 +137,7 @@
 				52ACA057267BBA5F00E1F86A /* Level.swift */,
 				52ACA03A267837BE00E1F86A /* Endpoint.swift */,
 				5244D0D3268667FF00BFAF6B /* Keyboard.swift */,
+				52D55D9E26A6B4ED000F6006 /* Filter.swift */,
 				52ACA03D267837F300E1F86A /* Language.swift */,
 				524CFE22269915CD00510D2F /* Favorite.swift */,
 			);
@@ -139,6 +159,8 @@
 		52ACA068267D213D00E1F86A /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				52D55D9B26A67E78000F6006 /* FetchedResultsTableViewController.swift */,
+				52D55DA126A75490000F6006 /* HeartButton.swift */,
 				52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */,
 				5244D0CB2682650400BFAF6B /* AnimationUtility.swift */,
 				52ACA05A267BBEB900E1F86A /* UIPaddedLabel.swift */,
@@ -154,6 +176,16 @@
 				52D55D5C26A1301D000F6006 /* Status.swift */,
 			);
 			path = CoreData;
+			sourceTree = "<group>";
+		};
+		52D55D7226A3D0C0000F6006 /* SQLite */ = {
+			isa = PBXGroup;
+			children = (
+				52D55D8726A3DA5F000F6006 /* Spelling.sqlite */,
+				52D55D8826A3DA5F000F6006 /* Spelling.sqlite-shm */,
+				52D55D8926A3DA5F000F6006 /* Spelling.sqlite-wal */,
+			);
+			path = SQLite;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -215,6 +247,9 @@
 			files = (
 				52ACA0282678316A00E1F86A /* LaunchScreen.storyboard in Resources */,
 				52ACA0252678316A00E1F86A /* Assets.xcassets in Resources */,
+				52D55D8B26A3DA5F000F6006 /* Spelling.sqlite-shm in Resources */,
+				52D55D8A26A3DA5F000F6006 /* Spelling.sqlite in Resources */,
+				52D55D8C26A3DA5F000F6006 /* Spelling.sqlite-wal in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,8 +264,11 @@
 				52D55D5826A12F99000F6006 /* ManagedWord.swift in Sources */,
 				52ACA03B267837BE00E1F86A /* Endpoint.swift in Sources */,
 				52ACA04F267961C700E1F86A /* Notification+Names.swift in Sources */,
+				52D55D9926A67BB9000F6006 /* WordTableViewCell.swift in Sources */,
 				52ACA01D2678316400E1F86A /* ViewController.swift in Sources */,
 				52ACA04326783CFC00E1F86A /* Word.swift in Sources */,
+				52D55D9626A638EF000F6006 /* ProfileTableViewController.swift in Sources */,
+				52D55D9C26A67E78000F6006 /* FetchedResultsTableViewController.swift in Sources */,
 				5244D0CC2682650400BFAF6B /* AnimationUtility.swift in Sources */,
 				524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */,
 				52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */,
@@ -242,11 +280,13 @@
 				52ACA066267D210900E1F86A /* UILabel+boldRegularText.swift in Sources */,
 				52ACA03E267837F300E1F86A /* Language.swift in Sources */,
 				524CFE23269915CE00510D2F /* Favorite.swift in Sources */,
+				52D55DA226A75491000F6006 /* HeartButton.swift in Sources */,
 				52D55D5D26A1301D000F6006 /* Status.swift in Sources */,
 				52ACA04C26794A6B00E1F86A /* AudioPlayer.swift in Sources */,
 				5244D0D4268667FF00BFAF6B /* Keyboard.swift in Sources */,
 				52ACA01B2678316400E1F86A /* SceneDelegate.swift in Sources */,
 				52ACA0232678316400E1F86A /* Spelling.xcdatamodeld in Sources */,
+				52D55D9F26A6B4ED000F6006 /* Filter.swift in Sources */,
 				52ACA060267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -389,6 +429,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = AYHFX5HL8Z;
 				INFOPLIST_FILE = Spelling/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -408,6 +449,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = AYHFX5HL8Z;
 				INFOPLIST_FILE = Spelling/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
