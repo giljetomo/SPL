@@ -31,7 +31,7 @@ class FetchedResultsTableViewController: UITableViewController, NSFetchedResults
       case .delete:
         tableView.deleteRows(at: [indexPath!], with: .fade)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-          self.tableView.reloadSections([indexPath!.section], with: .none)
+          self.tableView.reloadData()
         }
       case .move:
         if let changeIsUserDriven = changeIsUserDriven, changeIsUserDriven { break }

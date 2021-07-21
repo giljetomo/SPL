@@ -11,6 +11,12 @@ import CoreData
 class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRecognizerDelegate {
   
   var filter: Filter = .spelled
+
+  var searchTextPredicate: NSPredicate {
+    let searchText = searchController.searchBar.text ?? ""
+    let andPredicate = NSPredicate(format: "text CONTAINS[cd] %@", searchText)
+    return NSCompoundPredicate(type: .and, subpredicates: [predicate, andPredicate])
+  }
   var predicate: NSPredicate {
     let status = filter == .spelled ? 1 : 2
     let filterPredicate = filter == .favorites
@@ -67,24 +73,19 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
     return sv
   }()
   
+  let searchController = UISearchController(searchResultsController: nil)
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     navigationItem.titleView = hStackView
+    navigationItem.searchController = searchController
+    searchController.searchResultsUpdater = self
+    searchController.obscuresBackgroundDuringPresentation = false
     tableView.register(WordTableViewCell.self, forCellReuseIdentifier: WordTableViewCell.reuseIdentifier)
     filterChanged(self.countSegmentedControl)
   }
   
-  @objc func filterChanged(_ sender: UISegmentedControl) {
-    guard let title = sender.titleForSegment(at: sender.selectedSegmentIndex) else { return }
-    filter = Filter(rawValue: title.lowercased())!
-    do {
-      fetchedResultsController.fetchRequest.predicate = predicate
-      try fetchedResultsController.performFetch()
-      tableView.reloadData()
-    } catch {
-      print("fetch failed")
-    }
-    
+  fileprivate func setLabelCount() {
     do {
       guard let count = try? fetchedResultsController.managedObjectContext.count(for: request) else { return }
       let numberFormatter = NumberFormatter()
@@ -104,6 +105,19 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
     }
   }
   
+  @objc func filterChanged(_ sender: UISegmentedControl) {
+    guard let title = sender.titleForSegment(at: sender.selectedSegmentIndex) else { return }
+    filter = Filter(rawValue: title.lowercased())!
+    do {
+      fetchedResultsController.fetchRequest.predicate = predicate
+      try fetchedResultsController.performFetch()
+      tableView.reloadData()
+    } catch {
+      print("fetch failed")
+    }
+    setLabelCount()
+  }
+  
   @objc func heartTapped(_ sender: HeartButton) {
     guard let indexPath = sender.indexPath else { return }
 
@@ -113,6 +127,7 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
     } completion: { (_) in
       word.isFavorite.toggle()
       try? self.fetchedResultsController.managedObjectContext.save()
+      self.setLabelCount()
     }
   }
   
@@ -154,5 +169,18 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
   }
   override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
     return fetchedResultsController.section(forSectionIndexTitle: title, at: index)
+  }
+}
+
+extension ProfileTableViewController: UISearchResultsUpdating {
+  func updateSearchResults(for searchController: UISearchController) {
+    guard let text = searchController.searchBar.text else { return }
+    do {
+      fetchedResultsController.fetchRequest.predicate = text.isEmpty ? predicate : searchTextPredicate
+      try fetchedResultsController.performFetch()
+      tableView.reloadData()
+    } catch {
+      print(error.localizedDescription)
+    }
   }
 }

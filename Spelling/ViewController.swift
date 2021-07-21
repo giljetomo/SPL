@@ -644,9 +644,9 @@ class ViewController: UIViewController {
             CATransaction.begin()
             CATransaction.setCompletionBlock {
               DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
-                UIView.transition(with: self!.nextAndSubmitButton, duration: 1.0, options: .transitionCrossDissolve) {
-                  self?.nextAndSubmitButton.setTitle("Next", for: .normal)
-                  self?.nextAndSubmitButton.alpha = 1
+                UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
+                  sender.setTitle("Next", for: .normal)
+                  sender.alpha = 1
                 }
               }
             }
@@ -661,6 +661,7 @@ class ViewController: UIViewController {
       definitionCollectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
       CATransaction.commit()
     } else {
+      sender.isEnabled = false
       keyboardCollectionView.isUserInteractionEnabled = true
       answerSubmitted = false
       isLiked = false
@@ -682,6 +683,7 @@ class ViewController: UIViewController {
           self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
           
           if self!.keyboardOption != .keyboard { self?.keyboardCollectionView.reloadData() }
+          sender.isEnabled.toggle()
         }
       }
     }
@@ -972,7 +974,13 @@ extension ViewController: KeyboardCollectionViewCellDelegate {
 // MARK: - WordCollectionViewCellDelegate
 extension ViewController: WordCollectionViewCellDelegate {
   func isWordLiked(status: Bool) {
-    isLiked = status
-    print(isLiked)
+    guard let context = container?.viewContext, let text = fetchedWord?.text else { return }
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+      self?.isLiked = status
+      self?.fetchedWord = try? ManagedWord.findWord(text, in: context)
+      self?.fetchedWord?.isFavorite = self!.isLiked
+      try? context.save()
+    }
+
   }
 }
