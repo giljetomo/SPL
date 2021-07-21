@@ -9,15 +9,17 @@ import UIKit
 import Foundation
 import AVFoundation
 import CoreData
+import SafariServices
 
 class ViewController: UIViewController {
   
   var container: NSPersistentContainer? = AppDelegate.persistentContainer
   var fetchedWord: ManagedWord?
-  var level: Level = .traveller
+  var level: Level = .president
   
   //tracking the display of correct word in the collection view to be followed by heartImage
-  var isFirstLoad = true
+  var isFirstLoadWordSection = true
+  var isFirstLoadDefinitionSection = true
   var isLiked = false
   var isFromSpeechService = false
   var didChangeDiction = false
@@ -631,23 +633,37 @@ class ViewController: UIViewController {
     if sender.title(for: .normal) == "Submit" {
       answerSubmitted = true
       nextAndSubmitButton.alpha = 0
-      isFirstLoad = true
+      isFirstLoadWordSection = true
       keyboardCollectionView.isUserInteractionEnabled = false
       keyboardView.isUserInteractionEnabled = false
       
+      //present the correct word the first time
       CATransaction.begin()
       CATransaction.setCompletionBlock {
-        self.isFirstLoad = false
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) { [weak self] in
+        self.isFirstLoadWordSection = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+          //reload the correct word with the heart button visible
           CATransaction.begin()
           CATransaction.setCompletionBlock {
+            //check the answer
             CATransaction.begin()
             CATransaction.setCompletionBlock {
-              DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(500)) {
-                UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
-                  sender.setTitle("Next", for: .normal)
-                  sender.alpha = 1
+              self?.isFirstLoadDefinitionSection = false
+              DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+                //reload the definition section if it was unavailable to enable Safari search
+                CATransaction.begin()
+                CATransaction.setCompletionBlock {
+                  DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
+                    UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
+                      sender.setTitle("Next", for: .normal)
+                      sender.alpha = 1
+                    }
+                  }
                 }
+                if self!.partOfSpeech.isEmpty {
+                  self?.definitionCollectionView.reloadItems(at: [IndexPath(item: 0, section: 1)])
+                }
+                CATransaction.commit()
               }
             }
             self?.checkAnswer()
@@ -668,6 +684,7 @@ class ViewController: UIViewController {
       didChangeDiction = false
       partOfSpeech.removeAll()
       guessLabel.text?.removeAll()
+      isFirstLoadDefinitionSection = true
       
       guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
       print(text)
@@ -874,7 +891,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         
         guard let text = word?.text else { return cell }
         
-        if isFirstLoad {
+        if isFirstLoadWordSection {
           UIView.animate(withDuration: 0.5, delay: 0.5, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, animations: {
             AnimationUtility.viewSlideInFromTop(toBottom: cell)
           })
@@ -901,7 +918,10 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
           return cell
         }
         if partOfSpeech.count == 0 {
-          cell.setup(with: "Information", and: "Sorry, no definition available.")
+          if isFirstLoadDefinitionSection {
+            cell.setup(with: "Information", and: "Sorry, no definition available.")
+          }
+          else { cell.setup(with: "Search", and: "Tap the word for definition") }
           return cell
         }
         let partofSpeech = partOfSpeech[indexPath.item]
@@ -947,6 +967,29 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     return .zero
   }
   
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    if collectionView == definitionCollectionView {
+      guard let url = word?.searchURL,
+            partOfSpeech.isEmpty,
+            indexPath.section == 0,
+            !isFirstLoadDefinitionSection
+      else { return }
+      
+      guard let cell = collectionView.cellForItem(at: indexPath) else { return }
+      UIView.animate(withDuration: 0.10) {
+        cell.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+      } completion: { (_) in
+        UIView.animate(withDuration: 0.10) {
+          cell.transform = .identity
+        } completion: { [weak self] (_) in
+          let safariVC = SFSafariViewController(url: url)
+          self?.present(safariVC, animated: true, completion: nil)
+        }
+      }
+    }
+    
+  }
+  
 }
 
 // MARK: - KeyboardCollectionViewCellDelegate
@@ -981,6 +1024,6 @@ extension ViewController: WordCollectionViewCellDelegate {
       self?.fetchedWord?.isFavorite = self!.isLiked
       try? context.save()
     }
-
+    
   }
 }
