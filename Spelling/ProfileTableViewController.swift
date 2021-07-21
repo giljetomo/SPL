@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import SafariServices
 
 class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRecognizerDelegate {
   
@@ -169,6 +170,18 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
   }
   override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
     return fetchedResultsController.section(forSectionIndexTitle: title, at: index)
+  }
+  
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.deselectRow(at: indexPath, animated: false)
+    
+    guard let word = self.fetchedResultsController.object(at: indexPath).text else { return }
+    let searchText = "define \(word)"
+    guard let text = searchText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
+    let query = "https://www.google.com/search?q=\(text)"
+    guard let url = URL(string: query) else { return }
+    let safariVC = SFSafariViewController(url: url)
+    present(safariVC, animated: true, completion: nil)
   }
 }
 
