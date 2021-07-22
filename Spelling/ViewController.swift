@@ -15,7 +15,7 @@ class ViewController: UIViewController {
   
   var container: NSPersistentContainer? = AppDelegate.persistentContainer
   var fetchedWord: ManagedWord?
-  var level: Level = .president
+  var level: Level = .traveller
   
   //tracking the display of correct word in the collection view to be followed by heartImage
   var isFirstLoadWordSection = true
@@ -672,9 +672,10 @@ class ViewController: UIViewController {
                 self?.checkAnswer { (completed) in
                   if completed {
                     self?.isFirstLoadDefinitionSection = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(900)) { [weak self] in
                       self?.reloadDefinition { (completed) in
                         if completed {
+                          NotificationCenter.default.post(name: .animationsEnded, object: nil)
                           DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
                             UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
                               sender.setTitle("Next", for: .normal)
@@ -700,6 +701,7 @@ class ViewController: UIViewController {
       partOfSpeech.removeAll()
       guessLabel.text?.removeAll()
       isFirstLoadDefinitionSection = true
+      WordCollectionViewCell.allAnimationsLoaded = nil
       
       guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
       print(text)
@@ -826,22 +828,20 @@ class ViewController: UIViewController {
           print(error.localizedDescription)
         case .success(let word):
           if let item = word.first {
-            //            var definition = [String: String]()
             for meaning in item.meanings {
               if let definitionAPI = meaning.definitions.first?.definition {
-                self?.definition.updateValue(definitionAPI, forKey: meaning.partOfSpeech)
+                self?.definition.updateValue(definitionAPI, forKey: meaning.partOfSpeech + ":")
               }
             }
             print("fetched from API \(item.word)")
+            let fetchedWord = item.word.replacingOccurrences(of: "-", with: "").lowercased()
             
-            guard let text = self?.fetchedWord?.text, text == item.word.lowercased() else {
+            guard let text = self?.fetchedWord?.text, text == fetchedWord else {
               completion(false)
               return
             }
             if let audio = item.phonetics.first?.audio {
-              self?.word = Word(text: item.word.replacingOccurrences(of: "-", with: "").lowercased(),
-                                definition: self!.definition,
-                                audio: audio)
+              self?.word = Word(text: fetchedWord, definition: self!.definition, audio: audio)
               self?.initPlayer()
               completion(true)
             } else {
@@ -906,6 +906,9 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         cell.heartImageView.isHidden = true
         cell.liked = isLiked ? .liked : .unliked
         cell.delegate = self
+        cell.searchInSafari = { [weak self] in
+          self?.searchInSafari()
+        }
         
         guard let text = word?.text else { return cell }
         
@@ -921,6 +924,10 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
             }
           }
         }
+        NotificationCenter.default.removeObserver(cell, name: .animationsEnded, object: nil)
+        if !isFirstLoadDefinitionSection && partOfSpeech.isEmpty {
+          NotificationCenter.default.addObserver(cell, selector: #selector(WordCollectionViewCell.animationsEnded), name: .animationsEnded, object: nil)
+        }
         cell.setup(with: text)
         return cell
       } else {
@@ -932,14 +939,14 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         
         guard let word = word?.definition
         else {
-          cell.setup(with: "Error", and: "Please press next")
+          cell.setup(with: "Error:", and: "Please press next")
           return cell
         }
         if partOfSpeech.count == 0 {
           if isFirstLoadDefinitionSection {
-            cell.setup(with: "Information", and: "Sorry, no definition available.")
+            cell.setup(with: "Information:", and: "Sorry, no definition available.")
           }
-          else { cell.setup(with: "Search", and: "Tap the word for definition") }
+          else { cell.setup(with: "", and: "Tap the word for definition") }
           return cell
         }
         let partofSpeech = partOfSpeech[indexPath.item]
@@ -984,27 +991,32 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     }
     return .zero
   }
+  private func searchInSafari() {
+    guard let url = word?.searchURL else { return }
+    let safariVC = SFSafariViewController(url: url)
+    self.present(safariVC, animated: true, completion: nil)
+  }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    if collectionView == definitionCollectionView {
-      guard let url = word?.searchURL,
-            partOfSpeech.isEmpty,
-            indexPath.section == 0,
-            !isFirstLoadDefinitionSection
-      else { return }
-      
-      guard let cell = collectionView.cellForItem(at: indexPath) else { return }
-      UIView.animate(withDuration: 0.10) {
-        cell.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-      } completion: { (_) in
-        UIView.animate(withDuration: 0.10) {
-          cell.transform = .identity
-        } completion: { [weak self] (_) in
-          let safariVC = SFSafariViewController(url: url)
-          self?.present(safariVC, animated: true, completion: nil)
-        }
-      }
-    }
+//    if collectionView == definitionCollectionView {
+//      guard let url = word?.searchURL,
+//            partOfSpeech.isEmpty,
+//            indexPath.section == 0,
+//            allAnimationsLoaded
+//      else { return }
+//
+//      guard let cell = collectionView.cellForItem(at: indexPath) as? WordCollectionViewCell else { return }
+//      UIView.animate(withDuration: 0.10) {
+//        cell.wordLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+//      } completion: { (_) in
+//        UIView.animate(withDuration: 0.10) {
+//          cell.wordLabel.transform = .identity
+//        } completion: { [weak self] (_) in
+//          let safariVC = SFSafariViewController(url: url)
+//          self?.present(safariVC, animated: true, completion: nil)
+//        }
+//      }
+//    }
     
   }
   
@@ -1042,6 +1054,9 @@ extension ViewController: WordCollectionViewCellDelegate {
       self?.fetchedWord?.isFavorite = self!.isLiked
       try? context.save()
     }
-    
+  }
+  
+  func wordLabelTapped() {
+    print(#function)
   }
 }

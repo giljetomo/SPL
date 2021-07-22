@@ -31,8 +31,8 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
 //  constraints need to be applied so the button does not overflow outside the contentView
     definitionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5).isActive = true
     definitionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5).isActive = true
-    definitionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-    definitionLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
+    definitionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+    definitionLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 3).isActive = true
     contentView.layer.cornerRadius = 5
 //    contentView.backgroundColor = .cyan
   }
@@ -41,8 +41,7 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
   }
   
   func setup(with partOfSpeech: String, and definition: String) {
-    definitionLabel.setRegualAndBoldText(regualText: definition, boldText: "\(partOfSpeech): ")
-      //"\(partOfSpeech): \(definition)"
+    definitionLabel.setRegualAndBoldText(regualText: definition, boldText: "\(partOfSpeech) ")
   }
 }
 
