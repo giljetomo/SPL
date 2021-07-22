@@ -629,6 +629,33 @@ class ViewController: UIViewController {
     audioImageView.tintColor = audioImageView.isUserInteractionEnabled ? .systemBlue : .gray
   }
   
+  fileprivate func reloadDefinition(completion: @escaping (_ completed: Bool) -> Void) {
+    CATransaction.begin()
+    CATransaction.setCompletionBlock { completion(true) }
+    if partOfSpeech.isEmpty {
+      definitionCollectionView.reloadItems(at: [IndexPath(item: 0, section: 1)])
+    }
+    CATransaction.commit()
+  }
+  
+  fileprivate func showHeartButton(completion: @escaping (_ completed: Bool) -> Void) {
+    CATransaction.begin()
+    CATransaction.setCompletionBlock { completion(true) }
+    definitionCollectionView.reloadItems(at: [IndexPath(item: 0, section: 0)])
+    definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+    CATransaction.commit()
+  }
+  
+  fileprivate func showCorrectWord(completion: @escaping (_ completed: Bool) -> Void) {
+    CATransaction.begin()
+    CATransaction.setCompletionBlock {
+      self.isFirstLoadWordSection = false
+      completion(true)
+    }
+    definitionCollectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
+    CATransaction.commit()
+  }
+  
   @objc func fetchNextWord(_ sender: UIButton) {
     if sender.title(for: .normal) == "Submit" {
       answerSubmitted = true
@@ -637,45 +664,33 @@ class ViewController: UIViewController {
       keyboardCollectionView.isUserInteractionEnabled = false
       keyboardView.isUserInteractionEnabled = false
       
-      //present the correct word the first time
-      CATransaction.begin()
-      CATransaction.setCompletionBlock {
-        self.isFirstLoadWordSection = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
-          //reload the correct word with the heart button visible
-          CATransaction.begin()
-          CATransaction.setCompletionBlock {
-            //check the answer
-            CATransaction.begin()
-            CATransaction.setCompletionBlock {
-              self?.isFirstLoadDefinitionSection = false
-              DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
-                //reload the definition section if it was unavailable to enable Safari search
-                CATransaction.begin()
-                CATransaction.setCompletionBlock {
-                  DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
-                    UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
-                      sender.setTitle("Next", for: .normal)
-                      sender.alpha = 1
+      showCorrectWord { (completed) in
+        if completed {
+          DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+            self?.showHeartButton { (completed) in
+              if completed {
+                self?.checkAnswer { (completed) in
+                  if completed {
+                    self?.isFirstLoadDefinitionSection = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+                      self?.reloadDefinition { (completed) in
+                        if completed {
+                          DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
+                            UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
+                              sender.setTitle("Next", for: .normal)
+                              sender.alpha = 1
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
-                if self!.partOfSpeech.isEmpty {
-                  self?.definitionCollectionView.reloadItems(at: [IndexPath(item: 0, section: 1)])
-                }
-                CATransaction.commit()
               }
             }
-            self?.checkAnswer()
-            CATransaction.commit()
           }
-          self?.definitionCollectionView.reloadItems(at: [IndexPath(item: 0, section: 0)])
-          self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
-          CATransaction.commit()
         }
       }
-      definitionCollectionView.insertItems(at: [IndexPath(item: 0, section: 0)])
-      CATransaction.commit()
     } else {
       sender.isEnabled = false
       keyboardCollectionView.isUserInteractionEnabled = true
@@ -706,8 +721,10 @@ class ViewController: UIViewController {
     }
   }
   
-  private func checkAnswer() {
-    //frc deletes the entry from the tableview if the state update is performed in the background thread.
+  private func checkAnswer(completion: @escaping (_ completed: Bool) -> Void) {
+    CATransaction.begin()
+    CATransaction.setCompletionBlock { completion(true) }
+    
     guard let text = fetchedWord?.text, let context = container?.viewContext else { return }
     let isCorrect = text == guessLabel.text
     
@@ -736,12 +753,13 @@ class ViewController: UIViewController {
         self.guessLabel.layer.add(animation, forKey: "position")
       }
     }
-    
+    //frc deletes the entry from the tableview if the state update is performed in the background thread.
     context.perform {
       let word = try? ManagedWord.findWord(text, in: context)
       word?.state = isCorrect ? .spelled : .misspelled
     }
     try? context.save()
+    CATransaction.commit()
   }
   
   @objc func changeLanguage() {
