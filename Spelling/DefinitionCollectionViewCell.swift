@@ -8,6 +8,7 @@
 import UIKit
 
 class DefinitionCollectionViewCell: UICollectionViewCell {
+  static var isFirstLoadDone: Bool?
   static let reuseIdentifier = "DefinitionCollectionViewCell"
   var isAnimated = false
   
@@ -41,6 +42,7 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
   }
   
   func setup(with partOfSpeech: String, and definition: String) {
+    definitionLabel.font = .preferredFont(forTextStyle: DefinitionCollectionViewCell.isFirstLoadDone != nil ? .callout : .title3)
     definitionLabel.setRegualAndBoldText(regualText: definition, boldText: "\(partOfSpeech) ")
   }
 }

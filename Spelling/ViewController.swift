@@ -15,7 +15,7 @@ class ViewController: UIViewController {
   
   var container: NSPersistentContainer? = AppDelegate.persistentContainer
   var fetchedWord: ManagedWord?
-  var level: Level = .traveller
+  var level: Level = .citizen
   
   //tracking the display of correct word in the collection view to be followed by heartImage
   var isFirstLoadWordSection = true
@@ -24,6 +24,7 @@ class ViewController: UIViewController {
   var isFromSpeechService = false
   var didChangeDiction = false
   var answerSubmitted = false
+  var animationsPlaying = false
   
   var keyboardOption: KeyboardOption = .keyboard
   var shuffledWord = [[String]]()
@@ -487,9 +488,11 @@ class ViewController: UIViewController {
     nextAndSubmitButton.topAnchor.constraint(equalTo: keyboardSectionView.bottomAnchor, constant: 20).isActive = true
     nextAndSubmitButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
     
+    let width = view.frame.size.width
+    let padding = (width - (width * 0.95)) / 2 //relative to topView
     profileImageView.leadingAnchor.constraint(equalTo: dictionView.leadingAnchor).isActive = true
-    profileImageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-    profileImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.04).isActive = true
+    profileImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -padding - 8).isActive = true
+    profileImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
     profileImageView.widthAnchor.constraint(equalTo: profileImageView.heightAnchor, multiplier: 1).isActive = true
     
   }
@@ -607,6 +610,10 @@ class ViewController: UIViewController {
     volumeSlider.isUserInteractionEnabled.toggle()
     nextAndSubmitButton.isEnabled.toggle()
     
+    if animationsPlaying { setPlayImageViewColor()
+      return
+    }
+    
     if audioImageView.isUserInteractionEnabled {
       UIView.animate(withDuration: 0.10) { [weak self] in
         self?.setPlayImageViewColor()
@@ -618,11 +625,13 @@ class ViewController: UIViewController {
         self?.audioImageView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
       }
     }
+    
     guard !answerSubmitted else { return }
     
     dictionView.isUserInteractionEnabled.toggle()
     keyboardView.isUserInteractionEnabled.toggle()
     keyboardCollectionView.isUserInteractionEnabled.toggle()
+    profileImageView.isUserInteractionEnabled.toggle()
   }
   
   fileprivate func setPlayImageViewColor() {
@@ -663,6 +672,8 @@ class ViewController: UIViewController {
       isFirstLoadWordSection = true
       keyboardCollectionView.isUserInteractionEnabled = false
       keyboardView.isUserInteractionEnabled = false
+      animationsPlaying = true
+      changeAudioState()
       
       showCorrectWord { (completed) in
         if completed {
@@ -676,6 +687,8 @@ class ViewController: UIViewController {
                       self?.reloadDefinition { (completed) in
                         if completed {
                           NotificationCenter.default.post(name: .animationsEnded, object: nil)
+                          self?.changeAudioState()
+                          self?.animationsPlaying.toggle()
                           DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
                             UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
                               sender.setTitle("Next", for: .normal)
@@ -702,6 +715,7 @@ class ViewController: UIViewController {
       guessLabel.text?.removeAll()
       isFirstLoadDefinitionSection = true
       WordCollectionViewCell.allAnimationsLoaded = nil
+      DefinitionCollectionViewCell.isFirstLoadDone = nil
       
       guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
       print(text)
@@ -830,7 +844,8 @@ class ViewController: UIViewController {
           if let item = word.first {
             for meaning in item.meanings {
               if let definitionAPI = meaning.definitions.first?.definition {
-                self?.definition.updateValue(definitionAPI, forKey: meaning.partOfSpeech + ":")
+                let definition = Word.maskWord(item.word, from: definitionAPI)
+                self?.definition.updateValue(definition, forKey: meaning.partOfSpeech + ":")
               }
             }
             print("fetched from API \(item.word)")
@@ -937,6 +952,8 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
           AnimationUtility.viewSlideInFromTop(toBottom: cell)
         })
         
+        
+        
         guard let word = word?.definition
         else {
           cell.setup(with: "Error:", and: "Please press next")
@@ -944,9 +961,11 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         }
         if partOfSpeech.count == 0 {
           if isFirstLoadDefinitionSection {
-            cell.setup(with: "Information:", and: "Sorry, no definition available.")
+            cell.setup(with: "", and: "Sorry, no definition available.")
+          } else {
+            DefinitionCollectionViewCell.isFirstLoadDone = true
+            cell.setup(with: "", and: "Tap the word for definition")
           }
-          else { cell.setup(with: "", and: "Tap the word for definition") }
           return cell
         }
         let partofSpeech = partOfSpeech[indexPath.item]
