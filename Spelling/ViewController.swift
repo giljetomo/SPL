@@ -105,6 +105,7 @@ class ViewController: UIViewController {
     lbl.setContentCompressionResistancePriority(.required, for: .horizontal)
     return lbl
   }()
+  lazy var levelTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(launchLevelMenu))
   lazy var levelLabel: UILabel = {
     let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 8, right: 8)
     lbl.translatesAutoresizingMaskIntoConstraints = false
@@ -114,6 +115,7 @@ class ViewController: UIViewController {
     lbl.layer.cornerRadius = 5
     lbl.backgroundColor = .white
     lbl.textAlignment = .center
+    lbl.isUserInteractionEnabled = true
     return lbl
   }()
   lazy var playTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(playAudio))
@@ -320,6 +322,28 @@ class ViewController: UIViewController {
     }
   }
   
+  lazy var levelMenuLauncher: LevelMenuLauncher = {
+    let launcher = LevelMenuLauncher()
+    launcher.delegate = self
+    return launcher
+  }()
+  
+  @objc func launchLevelMenu() {
+    
+    guard answerSubmitted && !animationsPlaying else { return }
+    
+    UIView.animate(withDuration: 0.10) {
+      self.levelLabel.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+    } completion: { (_) in
+      UIView.animate(withDuration: 0.10) {
+        self.levelLabel.transform = .identity
+      } completion: { (_) in
+        self.levelMenuLauncher.showMenu()
+      }
+    }
+
+  }
+  
   private func generateLayout() -> UICollectionViewLayout {
     let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
       
@@ -405,6 +429,7 @@ class ViewController: UIViewController {
     languageLabel.addGestureRecognizer(dictionTapRecognizer)
     audioImageView.addGestureRecognizer(playTapRecognizer)
     profileImageView.addGestureRecognizer(profileTapRecognizer)
+    levelLabel.addGestureRecognizer(levelTapRecognizer)
     
     dictionView.heightAnchor.constraint(equalTo: topView.heightAnchor, multiplier: 0.80).isActive = true
     dictionView.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 8).isActive = true
@@ -609,6 +634,7 @@ class ViewController: UIViewController {
     audioImageView.isUserInteractionEnabled.toggle()
     volumeSlider.isUserInteractionEnabled.toggle()
     nextAndSubmitButton.isEnabled.toggle()
+    profileImageView.isUserInteractionEnabled.toggle()
     
     if animationsPlaying { setPlayImageViewColor()
       return
@@ -631,7 +657,6 @@ class ViewController: UIViewController {
     dictionView.isUserInteractionEnabled.toggle()
     keyboardView.isUserInteractionEnabled.toggle()
     keyboardCollectionView.isUserInteractionEnabled.toggle()
-    profileImageView.isUserInteractionEnabled.toggle()
   }
   
   fileprivate func setPlayImageViewColor() {
@@ -1016,29 +1041,6 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     self.present(safariVC, animated: true, completion: nil)
   }
   
-  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//    if collectionView == definitionCollectionView {
-//      guard let url = word?.searchURL,
-//            partOfSpeech.isEmpty,
-//            indexPath.section == 0,
-//            allAnimationsLoaded
-//      else { return }
-//
-//      guard let cell = collectionView.cellForItem(at: indexPath) as? WordCollectionViewCell else { return }
-//      UIView.animate(withDuration: 0.10) {
-//        cell.wordLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-//      } completion: { (_) in
-//        UIView.animate(withDuration: 0.10) {
-//          cell.wordLabel.transform = .identity
-//        } completion: { [weak self] (_) in
-//          let safariVC = SFSafariViewController(url: url)
-//          self?.present(safariVC, animated: true, completion: nil)
-//        }
-//      }
-//    }
-    
-  }
-  
 }
 
 // MARK: - KeyboardCollectionViewCellDelegate
@@ -1075,7 +1077,15 @@ extension ViewController: WordCollectionViewCellDelegate {
     }
   }
   
-  func wordLabelTapped() {
-    print(#function)
+}
+
+extension ViewController: LevelMenuLauncherDelegate {
+  func changeLevel(to level: Level) {
+    guard self.level != level else { return }
+    self.level = level
+    
+    UIView.transition(with: levelLabel, duration: 0.5, options: .transitionFlipFromTop) {
+      self.levelLabel.text = self.level.rawValue.uppercased()
+    }
   }
 }

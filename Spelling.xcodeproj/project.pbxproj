@@ -40,6 +40,8 @@
 		52D55D9C26A67E78000F6006 /* FetchedResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D9B26A67E78000F6006 /* FetchedResultsTableViewController.swift */; };
 		52D55D9F26A6B4ED000F6006 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D9E26A6B4ED000F6006 /* Filter.swift */; };
 		52D55DA226A75491000F6006 /* HeartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55DA126A75490000F6006 /* HeartButton.swift */; };
+		52D55DAD26AB70F8000F6006 /* LevelMenuLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55DAC26AB70EA000F6006 /* LevelMenuLauncher.swift */; };
+		52D55DB026AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55DAF26AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +80,8 @@
 		52D55D9B26A67E78000F6006 /* FetchedResultsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsTableViewController.swift; sourceTree = "<group>"; };
 		52D55D9E26A6B4ED000F6006 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		52D55DA126A75490000F6006 /* HeartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartButton.swift; sourceTree = "<group>"; };
+		52D55DAC26AB70EA000F6006 /* LevelMenuLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelMenuLauncher.swift; sourceTree = "<group>"; };
+		52D55DAF26AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelMenuCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +119,7 @@
 				52ACA05D267BE15C00E1F86A /* Supporting Files */,
 				52ACA01C2678316400E1F86A /* ViewController.swift */,
 				5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */,
+				52D55DAF26AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift */,
 				52D55D9526A638EF000F6006 /* ProfileTableViewController.swift */,
 				52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */,
 				524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */,
@@ -136,6 +141,7 @@
 				52D55D50269E78A9000F6006 /* SpeechService.swift */,
 				52ACA057267BBA5F00E1F86A /* Level.swift */,
 				52ACA03A267837BE00E1F86A /* Endpoint.swift */,
+				52D55DAC26AB70EA000F6006 /* LevelMenuLauncher.swift */,
 				5244D0D3268667FF00BFAF6B /* Keyboard.swift */,
 				52D55D9E26A6B4ED000F6006 /* Filter.swift */,
 				52ACA03D267837F300E1F86A /* Language.swift */,
@@ -271,10 +277,12 @@
 				52D55D9C26A67E78000F6006 /* FetchedResultsTableViewController.swift in Sources */,
 				5244D0CC2682650400BFAF6B /* AnimationUtility.swift in Sources */,
 				524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */,
+				52D55DAD26AB70F8000F6006 /* LevelMenuLauncher.swift in Sources */,
 				52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */,
 				52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */,
 				52ACA0382678367300E1F86A /* WordInfoAPI.swift in Sources */,
 				52ACA058267BBA6000E1F86A /* Level.swift in Sources */,
+				52D55DB026AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift in Sources */,
 				5244D0D926866D3000BFAF6B /* KeyboardCollectionViewCell.swift in Sources */,
 				52ACA034267832AC00E1F86A /* WordAPI.swift in Sources */,
 				52ACA066267D210900E1F86A /* UILabel+boldRegularText.swift in Sources */,
