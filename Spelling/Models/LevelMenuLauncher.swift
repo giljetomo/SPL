@@ -41,7 +41,7 @@ class LevelMenuLauncher: NSObject {
       window.addSubview(menuCollectionView)
       windowHeight = window.frame.height
       guard let windowHeight = windowHeight else { return }
-      let height = (windowHeight * 0.30)
+      let height = (windowHeight * 0.25)
       menuCollectionView.frame = CGRect(x: 0, y: window.frame.height, width: window.frame.width, height: height)
       
       UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut) {
@@ -77,7 +77,7 @@ class LevelMenuLauncher: NSObject {
   
   private func generateLayout() -> UICollectionViewLayout {
     let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
-      let padding = layoutEnvironment.container.contentSize.width * 0.05
+      let padding = layoutEnvironment.container.contentSize.width * 0.02
       
       let item = NSCollectionLayoutItem(
         layoutSize: NSCollectionLayoutSize(

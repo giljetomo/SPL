@@ -9,6 +9,7 @@ import UIKit
 
 protocol WordCollectionViewCellDelegate: class {
   func isWordLiked(status: Bool)
+  func wordTapped()
 }
 
 class WordCollectionViewCell: UICollectionViewCell {
@@ -54,7 +55,7 @@ class WordCollectionViewCell: UICollectionViewCell {
     sv.axis = .horizontal
     sv.distribution = .equalCentering
     sv.alignment = .center
-    sv.spacing = 5
+    sv.spacing = 0
     return sv
   }()
   
@@ -66,25 +67,27 @@ class WordCollectionViewCell: UICollectionViewCell {
     heartImageView.addGestureRecognizer(heartTapRecognizer)
     wordLabel.addGestureRecognizer(wordTapRecognizer)
     
+    contentView.addSubview(view)
+    //  constraints need to be applied so the button does not overflow outside the contentView
+    view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+    view.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+    contentView.layer.cornerRadius = 5
+    
     view.addSubview(heartImageView)
     heartImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     heartImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-    heartImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.70).isActive = true
+    heartImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.50).isActive = true
     heartImageView.widthAnchor.constraint(equalTo: heartImageView.heightAnchor, multiplier: 1).isActive = true
     
     view.addSubview(hStackView)
     hStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     hStackView.trailingAnchor.constraint(equalTo: heartImageView.leadingAnchor, constant: -5).isActive = true
-    hStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: heartImageView.intrinsicContentSize.width + 5).isActive = true
-    
-    contentView.addSubview(view)
-    //  constraints need to be applied so the button does not overflow outside the contentView
-    view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-    view.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-    contentView.layer.cornerRadius = 5
+    hStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: heartImageView.intrinsicContentSize.width + 15.0).isActive = true
+    hStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
   }
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -107,7 +110,9 @@ class WordCollectionViewCell: UICollectionViewCell {
   }
   
   @objc func wordTapped() {
-    guard WordCollectionViewCell.allAnimationsLoaded != nil else { return }
+    guard WordCollectionViewCell.allAnimationsLoaded != nil else {
+      delegate?.wordTapped()
+      return }
     
     UIView.animate(withDuration: 0.10) { [weak self] in
       self?.wordLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
