@@ -12,6 +12,7 @@ protocol WordCollectionViewCellDelegate: class {
 }
 
 class WordCollectionViewCell: UICollectionViewCell {
+  static var allAnimationsLoaded: Bool?
   static let reuseIdentifier = "WordCollectionViewCell"
   weak var delegate: WordCollectionViewCellDelegate?
   
@@ -20,16 +21,14 @@ class WordCollectionViewCell: UICollectionViewCell {
     v.translatesAutoresizingMaskIntoConstraints = false
     return v
   }()
-  
+  lazy var wordTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(wordTapped))
   let wordLabel: UIPaddedLabel = {
     let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 5, right: 5)
     lbl.font = UIFont.preferredFont(forTextStyle: .largeTitle)
     lbl.adjustsFontForContentSizeCategory = true
     lbl.adjustsFontSizeToFitWidth = true
-    lbl.translatesAutoresizingMaskIntoConstraints = false
     lbl.textAlignment = .center
-    lbl.layer.masksToBounds = true
-    lbl.layer.cornerRadius = 5
+    lbl.isUserInteractionEnabled = true
     return lbl
   }()
   var liked: Favorite = .unliked {
@@ -37,7 +36,8 @@ class WordCollectionViewCell: UICollectionViewCell {
       heartImageView.image = UIImage(named: liked.rawValue)
     }
   }
-  lazy var playTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
+  var searchInSafari: (() -> ())?
+  lazy var heartTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(heartTapped))
   let heartImageView: UIImageView = {
     let iv = UIImageView()
     iv.translatesAutoresizingMaskIntoConstraints = false
@@ -48,23 +48,23 @@ class WordCollectionViewCell: UICollectionViewCell {
     return iv
   }()
   
+  lazy var hStackView: UIStackView = {
+    let sv = UIStackView(arrangedSubviews: [UIView(), wordLabel, UIView()])
+    sv.translatesAutoresizingMaskIntoConstraints = false
+    sv.axis = .horizontal
+    sv.distribution = .equalCentering
+    sv.alignment = .center
+    sv.spacing = 0
+    return sv
+  }()
+  
+  @objc func animationsEnded() { WordCollectionViewCell.allAnimationsLoaded = true }
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    heartImageView.addGestureRecognizer(playTapRecognizer)
-    
-    view.addSubview(heartImageView)
-    heartImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-    heartImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
-    heartImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.50).isActive = true
-    heartImageView.widthAnchor.constraint(equalTo: heartImageView.heightAnchor, multiplier: 1).isActive = true
-    
-    view.addSubview(wordLabel)
-    wordLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-    wordLabel.trailingAnchor.constraint(equalTo: heartImageView.leadingAnchor, constant: -5).isActive = true
-    wordLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: heartImageView.intrinsicContentSize.width + 5).isActive = true
-    wordLabel.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-    wordLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    heartImageView.addGestureRecognizer(heartTapRecognizer)
+    wordLabel.addGestureRecognizer(wordTapRecognizer)
     
     contentView.addSubview(view)
     //  constraints need to be applied so the button does not overflow outside the contentView
@@ -73,7 +73,20 @@ class WordCollectionViewCell: UICollectionViewCell {
     view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
     view.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
     contentView.layer.cornerRadius = 5
+    
+    view.addSubview(heartImageView)
+    heartImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    heartImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    heartImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.50).isActive = true
+    heartImageView.widthAnchor.constraint(equalTo: heartImageView.heightAnchor, multiplier: 1).isActive = true
+    
+    view.addSubview(hStackView)
+    hStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    hStackView.trailingAnchor.constraint(equalTo: heartImageView.leadingAnchor, constant: -5).isActive = true
+    hStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: heartImageView.intrinsicContentSize.width + 15.0).isActive = true
+    hStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
   }
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -82,7 +95,7 @@ class WordCollectionViewCell: UICollectionViewCell {
     wordLabel.text = text
   }
   
-  @objc func tapped() {
+  @objc func heartTapped() {
     liked.toggle()
     
     UIView.animate(withDuration: 0.10) {
@@ -94,4 +107,19 @@ class WordCollectionViewCell: UICollectionViewCell {
     }
     delegate?.isWordLiked(status: liked == .liked)
   }
+  
+  @objc func wordTapped() {
+    guard WordCollectionViewCell.allAnimationsLoaded != nil else { return }
+    
+    UIView.animate(withDuration: 0.10) { [weak self] in
+      self?.wordLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+    } completion: { (_) in
+      UIView.animate(withDuration: 0.10) { [weak self] in
+        self?.wordLabel.transform = .identity
+      } completion: { [weak self] (_) in
+        self?.searchInSafari?()
+      }
+    }
+  }
+  
 }

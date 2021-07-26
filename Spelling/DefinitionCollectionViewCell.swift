@@ -8,6 +8,7 @@
 import UIKit
 
 class DefinitionCollectionViewCell: UICollectionViewCell {
+  static var isFirstLoadDone: Bool?
   static let reuseIdentifier = "DefinitionCollectionViewCell"
   var isAnimated = false
   
@@ -21,7 +22,6 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
     lbl.font = UIFont.preferredFont(forTextStyle: .title3)
     lbl.adjustsFontForContentSizeCategory = true
     lbl.adjustsFontSizeToFitWidth = true
-//    lbl.backgroundColor = .lightGray
     return lbl
   }()
   
@@ -29,20 +29,19 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
     super.init(frame: frame)
     contentView.addSubview(definitionLabel)
 //  constraints need to be applied so the button does not overflow outside the contentView
-    definitionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5).isActive = true
-    definitionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5).isActive = true
-    definitionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5).isActive = true
-    definitionLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
+    definitionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+    definitionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+    definitionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+    definitionLabel.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
     contentView.layer.cornerRadius = 5
-//    contentView.backgroundColor = .cyan
   }
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
   func setup(with partOfSpeech: String, and definition: String) {
-    definitionLabel.setRegualAndBoldText(regualText: definition, boldText: "\(partOfSpeech): ")
-      //"\(partOfSpeech): \(definition)"
+    definitionLabel.font = .preferredFont(forTextStyle: DefinitionCollectionViewCell.isFirstLoadDone != nil ? .callout : .title3)
+    definitionLabel.setRegualAndBoldText(regualText: definition, boldText: "\(partOfSpeech) ")
   }
 }
 

@@ -69,4 +69,11 @@ extension ManagedWord {
     get { return Status(rawValue: self.status) ?? .def }
     set { self.status = newValue.rawValue }
   }
+  
+  var searchURL: URL? {
+    let searchText = "define \(self.text!)"
+    let text = searchText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+    let query = "https://www.google.com/search?q=\(text)"
+    return URL(string: query)
+  }
 }

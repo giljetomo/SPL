@@ -9,4 +9,5 @@ import Foundation
 
 extension Notification.Name {
   static let playbackEnded = NSNotification.Name("playbackEnded")
+  static let animationsEnded = NSNotification.Name("animationsEnded")
 }

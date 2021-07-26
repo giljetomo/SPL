@@ -21,10 +21,12 @@ class KeyboardCollectionViewCell: UICollectionViewCell {
     let btn = UIButton()
     btn.translatesAutoresizingMaskIntoConstraints = false
     btn.setTitleColor(.black, for: .normal)
-    btn.titleLabel?.font = UIFont.systemFont(ofSize: 25)
-    btn.layer.cornerRadius = 6
+    btn.titleLabel?.font = .preferredFont(forTextStyle: .title2)
+//    btn.titleLabel?.font = UIFont.systemFont(ofSize: 25)
+    btn.layer.cornerRadius = 5
     btn.layer.borderWidth = 1 / UIScreen.main.scale
     btn.titleLabel?.adjustsFontSizeToFitWidth = true
+    btn.titleLabel?.adjustsFontForContentSizeCategory = true
     btn.backgroundColor = .white
     btn.contentEdgeInsets = UIEdgeInsets(top: 2, left: 5, bottom: 2, right: 5)
     return btn
