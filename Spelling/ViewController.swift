@@ -76,43 +76,13 @@ class ViewController: UIViewController {
   var definitionCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   var keyboardCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   
-  lazy var viewTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(closeDictionView))
-  var dictionViewIsOpen = false
-  var dictionViewWidthConstraint: NSLayoutConstraint!
-  lazy var dictionTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(changeLanguage))
-  let dictionView: UIView = {
-    let v = UIView()
-    v.translatesAutoresizingMaskIntoConstraints = false
-    v.layer.cornerRadius = 4
-    v.backgroundColor = .white
-    return v
-  }()
-  lazy var dictionHStackView: UIStackView = {
-    let sv = UIStackView(arrangedSubviews: [languageLabel, dictionUS, dictionUK])
-    sv.translatesAutoresizingMaskIntoConstraints = false
-    sv.axis = .horizontal
-    sv.alignment = .fill
-    sv.distribution = .equalSpacing
-    sv.spacing = 5
-    return sv
-  }()
-  let languageLabel: UILabel = {
-    let lbl = UILabel()
-    lbl.text = "US"
-    lbl.font = .systemFont(ofSize: 16)
-    lbl.textAlignment = .center
-    lbl.layer.masksToBounds = true
-    lbl.isUserInteractionEnabled = true
-    lbl.setContentHuggingPriority(.required, for: .horizontal)
-    lbl.setContentCompressionResistancePriority(.required, for: .horizontal)
-    return lbl
-  }()
   lazy var levelTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(launchLevelMenu))
   lazy var levelLabel: UILabel = {
     let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 8, right: 8)
     lbl.translatesAutoresizingMaskIntoConstraints = false
     lbl.text = self.level.rawValue.uppercased()
-    lbl.font = .systemFont(ofSize: 16)
+    lbl.font = .preferredFont(forTextStyle: .headline)
+    lbl.adjustsFontSizeToFitWidth = true
     lbl.layer.masksToBounds = true
     lbl.layer.cornerRadius = 5
     lbl.backgroundColor = .white
@@ -187,7 +157,7 @@ class ViewController: UIViewController {
     sv.spacing = 3
     return sv
   }()
-  var keyboardViewIsOpen = true
+  var keyboardViewIsOpen = false
   var keyboardViewWidthConstraint: NSLayoutConstraint!
   var keyboardSegmentedControlWidth: CGFloat!
   var keyboardImageViewWidth: CGFloat!
@@ -203,27 +173,22 @@ class ViewController: UIViewController {
     sc.addTarget(self, action: #selector(keyboardChanged(_:)), for: .valueChanged)
     return sc
   }()
-  let dictionUS: UIButton = {
+  let dictionButton: UIButton = {
     let btn = UIButton()
     btn.setTitle("US", for: .normal)
+    btn.titleLabel?.font = .preferredFont(forTextStyle: .headline)
     btn.titleLabel?.adjustsFontSizeToFitWidth = true
     btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.setTitleColor(.systemBlue, for: .normal)
+    btn.contentMode = .scaleAspectFit
+    btn.setTitleColor(.black, for: .normal)
     btn.addTarget(self, action: #selector(changeDiction(_:)), for: .touchUpInside)
-    btn.isHidden = true
+    btn.backgroundColor = .white
+    btn.layer.cornerRadius = 5
+    btn.layer.masksToBounds = true
+    btn.contentEdgeInsets = .init(top: 5, left: 7, bottom: 5, right: 7)
     return btn
   }()
   
-  let dictionUK: UIButton = {
-    let btn = UIButton()
-    btn.setTitle("UK", for: .normal)
-    btn.titleLabel?.adjustsFontSizeToFitWidth = true
-    btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.setTitleColor(.systemBlue, for: .normal)
-    btn.isHidden = true
-    btn.addTarget(self, action: #selector(changeDiction(_:)), for: .touchUpInside)
-    return btn
-  }()
   let guessLabelView: UIView = {
     let v = UIView()
     v.translatesAutoresizingMaskIntoConstraints = false
@@ -257,7 +222,6 @@ class ViewController: UIViewController {
     iv.isUserInteractionEnabled = true
     return iv
   }()
-  
   private func isRandomWordFetchSuccessful() -> Bool {
     guard let context = container?.viewContext else { return false }
     fetchedWord = try? ManagedWord.fetchRandomWord(with: level, in: context)
@@ -266,7 +230,6 @@ class ViewController: UIViewController {
   
   @objc func viewProfile() {
     UIView.animate(withDuration: 0.20) { [weak self] in
-      self?.closeDictionView()
       self?.profileImageView.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
     } completion: { (_) in
       UIView.animate(withDuration: 0.10) { [weak self] in
@@ -297,7 +260,6 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = UIColor(named: "White")
-    
     
     //    if let context = container?.viewContext {
     //      ManagedWord.preloadData(in: context)
@@ -339,8 +301,6 @@ class ViewController: UIViewController {
   override func viewDidLayoutSubviews() {
     if keyboardSegmentedControlWidth == nil {
       keyboardSegmentedControlWidth = keyboardSegmentedControl.frame.size.width
-      print(keyboardView.frame.size.width)
-      print(keyboardSegmentedControl.frame.size.width)
     }
     if keyboardImageViewWidth == nil || keyboardImageViewWidth == 0.0 {
       keyboardImageViewWidth = keyboardImageView.frame.size.width
@@ -354,7 +314,6 @@ class ViewController: UIViewController {
   }()
   
   @objc func launchLevelMenu() {
-    if dictionViewIsOpen { changeLanguage() }
     guard answerSubmitted && !animationsPlaying else { return }
     
     UIView.animate(withDuration: 0.10) {
@@ -430,9 +389,6 @@ class ViewController: UIViewController {
     return layout
   }
   
-  @objc func closeDictionView() {
-    if dictionViewIsOpen { changeLanguage() }
-  }
   fileprivate func setupViewLayout() {
     view.addSubview(topView)
     view.addSubview(definitionView)
@@ -443,37 +399,20 @@ class ViewController: UIViewController {
     view.addSubview(profileImageView)
     view.addSubview(keyboardBlackView)
     view.addSubview(keyboardView)
-    
-    topView.addSubview(dictionView)
-    dictionViewWidthConstraint = NSLayoutConstraint(
-      item: dictionView,
-      attribute: .width,
-      relatedBy: .equal,
-      toItem: topView,
-      attribute: .width,
-      multiplier: 0.10,
-      constant: 0)
-    view.addGestureRecognizer(viewTapRecognizer)
-    topView.addConstraint(dictionViewWidthConstraint)
-    languageLabel.addGestureRecognizer(dictionTapRecognizer)
+
     audioImageView.addGestureRecognizer(playTapRecognizer)
     profileImageView.addGestureRecognizer(profileTapRecognizer)
     levelLabel.addGestureRecognizer(levelTapRecognizer)
     keyboardBlackView.addGestureRecognizer(keyboardBlackViewTapRecognizer)
     
-    dictionView.heightAnchor.constraint(equalTo: topView.heightAnchor, multiplier: 0.80).isActive = true
-    dictionView.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 8).isActive = true
-    dictionView.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
-    
-    dictionView.addSubview(dictionHStackView)
-    dictionHStackView.widthAnchor.constraint(equalTo: dictionView.widthAnchor).isActive = true
-    dictionHStackView.heightAnchor.constraint(equalTo: dictionView.heightAnchor).isActive = true
-    dictionHStackView.centerYAnchor.constraint(equalTo: dictionView.centerYAnchor).isActive = true
+    topView.addSubview(dictionButton)
+    dictionButton.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 8).isActive = true
+    dictionButton.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
     
     topView.addSubview(levelLabel)
     levelLabel.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -8).isActive = true
     levelLabel.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
-    levelLabel.heightAnchor.constraint(equalTo: dictionView.heightAnchor).isActive = true
+    levelLabel.heightAnchor.constraint(equalTo: dictionButton.heightAnchor).isActive = true
     
     topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
     topView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.95).isActive = true
@@ -546,7 +485,7 @@ class ViewController: UIViewController {
     
     let width = view.frame.size.width
     let padding = (width - (width * 0.95)) / 2 //relative to topView
-    profileImageView.leadingAnchor.constraint(equalTo: dictionView.leadingAnchor).isActive = true
+    profileImageView.leadingAnchor.constraint(equalTo: dictionButton.leadingAnchor).isActive = true
     profileImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -padding - 8).isActive = true
     profileImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
     profileImageView.widthAnchor.constraint(equalTo: profileImageView.heightAnchor, multiplier: 1).isActive = true
@@ -569,18 +508,17 @@ class ViewController: UIViewController {
   
   
   @objc func keyboardTapped() {
-    closeDictionView()
     keyboardViewIsOpen.toggle()
     
     let constant =
       keyboardViewIsOpen
-      ? (keyboardImageViewWidth ?? 0.0)
-      : ((keyboardImageViewWidth ?? 0.0)
-          + (keyboardSegmentedControlWidth ?? 0.0))
+      //      ((keyboardImageViewWidth ?? 0.0) + (keyboardSegmentedControlWidth ?? 0.0))
+      ? keyboardImageView.intrinsicContentSize.width + keyboardSegmentedControl.intrinsicContentSize.width
+      : (keyboardImageViewWidth ?? 0.0)
     keyboardView.removeConstraint(keyboardViewWidthConstraint)
     
     UIView.animate(withDuration: 0.40) { [weak self] in
-      self?.keyboardBlackView.alpha = self!.keyboardViewIsOpen ? 0.0 : 0.7
+      self?.keyboardBlackView.alpha = self!.keyboardViewIsOpen ? 0.7 : 0.0
       self?.keyboardSegmentedControl.isHidden.toggle()
       self?.keyboardViewWidthConstraint = NSLayoutConstraint(
         item: self!.keyboardView,
@@ -616,7 +554,6 @@ class ViewController: UIViewController {
   }
   
   @objc func playAudio() {
-    closeDictionView()
     changeAudioState()
     if isFromSpeechService {
       guard let text = word?.text else { return }
@@ -630,7 +567,6 @@ class ViewController: UIViewController {
   @objc func adjustVolume(_ sender: UISlider) {
     sender.alpha = 0.2
     UIView.animate(withDuration: 0.40) { [weak self] in
-      self?.closeDictionView()
       sender.transform = .identity
       if sender.value == 0.0 {
         self?.audioImageView.image = UIImage(named: "muted")
@@ -671,7 +607,8 @@ class ViewController: UIViewController {
     nextAndSubmitButton.isEnabled.toggle()
     profileImageView.isUserInteractionEnabled.toggle()
     definitionCollectionView.isUserInteractionEnabled.toggle()
-    dictionView.isUserInteractionEnabled.toggle()
+    dictionButton.isUserInteractionEnabled.toggle()
+    levelLabel.isUserInteractionEnabled.toggle()
     
     if animationsPlaying { setPlayImageViewColor()
       return
@@ -727,7 +664,6 @@ class ViewController: UIViewController {
   }
   
   @objc func fetchNextWord(_ sender: UIButton) {
-    closeDictionView()
     if sender.title(for: .normal) == "Submit" {
       answerSubmitted = true
       nextAndSubmitButton.alpha = 0
@@ -749,12 +685,13 @@ class ViewController: UIViewController {
                       self?.reloadDefinition { (completed) in
                         if completed {
                           self?.changeAudioState()
-                          self?.animationsPlaying.toggle()
                           NotificationCenter.default.post(name: .animationsEnded, object: nil)
                           DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
                             UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
                               sender.setTitle("Next", for: .normal)
                               sender.alpha = 1
+                            } completion: { (_) in
+                              self?.animationsPlaying.toggle()
                             }
                           }
                         }
@@ -840,56 +777,41 @@ class ViewController: UIViewController {
     CATransaction.commit()
   }
   
-  @objc func changeLanguage() {
-    guard !animationsPlaying else { return }
-    dictionViewIsOpen.toggle()
-    
-    let language = country == .US ? "US" : "UK"
-    dictionUK.backgroundColor = country == .US ? .clear : .cyan
-    dictionUS.backgroundColor = country == .UK ? .clear : .cyan
-    
-    let multiplier = CGFloat(dictionViewIsOpen ? 0.30 : 0.10)
-    topView.removeConstraint(dictionViewWidthConstraint)
-    
-    UIView.animate(withDuration: 0.25) { [weak self] in
-      self?.dictionUK.isHidden.toggle()
-      self?.dictionUS.isHidden.toggle()
-      self?.languageLabel.text = ""
-      self?.dictionViewWidthConstraint = NSLayoutConstraint(
-        item: self!.dictionView,
-        attribute: .width,
-        relatedBy: .equal,
-        toItem: self!.topView,
-        attribute: .width,
-        multiplier: multiplier,
-        constant: 0)
-      self?.topView.addConstraint(self!.dictionViewWidthConstraint)
-      self?.view.layoutIfNeeded()
-    } completion: { (_) in
-      UIView.animate(withDuration: 0) { [weak self] in
-        self?.languageLabel.text = self!.dictionViewIsOpen ? "✖️" : language //🔙
-        self?.view.layoutIfNeeded()
-      }
-    }
-  }
-  
   @objc func changeDiction(_ sender: UIButton) {
-    let title = sender.title(for: .normal) == "US" ? Country.US.rawValue : Country.UK.rawValue
-    guard let selectedCountry = Country(rawValue: title), selectedCountry != country else {
-      changeLanguage()
-      return
-    }
+    guard !animationsPlaying else { return }
+    
+    let title = sender.title(for: .normal) == "US" ? "UK" : "US"
+    
     country.toggle()
-    changeLanguage()
     didChangeDiction = true
-    guard !isFromSpeechService else {
-      changeUIStateAfterFetch(true)
-      return
+    
+    UIView.animate(withDuration: 0.15) {
+      sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+    } completion: { (_) in
+      UIView.animate(withDuration: 0.15) {
+        sender.transform = .identity
+      } completion: { (_) in
+        UIView.transition(with: sender, duration: 0.5, options: .transitionFlipFromTop) {
+          sender.setTitle(title, for: .normal)
+        } completion: { (_) in
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+            guard !self!.isFromSpeechService else {
+              self?.changeUIStateAfterFetch(true)
+              return
+            }
+            self?.fetchWordAPI(with: self!.country) { [weak self] (successful) in
+              //some words don't have both diction available
+              if successful { self?.changeUIStateAfterFetch(successful) }
+            }
+          }
+        }
+      }
+
     }
-    fetchWordAPI(with: country) { [weak self] (successful) in
-      //some words don't have both diction available
-      if successful { self?.changeUIStateAfterFetch(successful) }
-    }
+
+
+
+
     
   }
   
@@ -1067,18 +989,16 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     }
   }
   
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    if collectionView == keyboardCollectionView {
-      return CGSize(width: (keyboardSectionView.frame.width/9)-5, height: (keyboardSectionView.frame.width/9)-5)
-    }
-    return .zero
-  }
+//  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+//    if collectionView == keyboardCollectionView {
+//      return CGSize(width: (keyboardSectionView.frame.width/9)-5, height: (keyboardSectionView.frame.width/9)-5)
+//    }
+//    return .zero
+//  }
   private func searchInSafari() {
     guard let url = word?.searchURL else { return }
     let safariVC = SFSafariViewController(url: url)
-    self.present(safariVC, animated: true) { [weak self] in
-      self?.closeDictionView()
-    }
+    self.present(safariVC, animated: true)
   }
   
 }
@@ -1086,7 +1006,6 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 // MARK: - KeyboardCollectionViewCellDelegate
 extension ViewController: KeyboardCollectionViewCellDelegate {
   func keyPressed(for key: String) {
-    closeDictionView()
     guard let text = word?.text else { return }
     let word: String = {
       guard let text = guessLabel.text else { return "" }
@@ -1108,11 +1027,7 @@ extension ViewController: KeyboardCollectionViewCellDelegate {
 // MARK: - WordCollectionViewCellDelegate
 extension ViewController: WordCollectionViewCellDelegate {
   func isWordLiked(status: Bool) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-      self?.closeDictionView()
-    }
-    
-    
+  
     guard let context = container?.viewContext, let text = fetchedWord?.text else { return }
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
       self?.isLiked = status
@@ -1121,7 +1036,6 @@ extension ViewController: WordCollectionViewCellDelegate {
       try? context.save()
     }
   }
-  func wordTapped() { closeDictionView() }
   
 }
 

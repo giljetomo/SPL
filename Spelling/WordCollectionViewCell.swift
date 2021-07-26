@@ -9,7 +9,6 @@ import UIKit
 
 protocol WordCollectionViewCellDelegate: class {
   func isWordLiked(status: Bool)
-  func wordTapped()
 }
 
 class WordCollectionViewCell: UICollectionViewCell {
@@ -110,9 +109,7 @@ class WordCollectionViewCell: UICollectionViewCell {
   }
   
   @objc func wordTapped() {
-    guard WordCollectionViewCell.allAnimationsLoaded != nil else {
-      delegate?.wordTapped()
-      return }
+    guard WordCollectionViewCell.allAnimationsLoaded != nil else { return }
     
     UIView.animate(withDuration: 0.10) { [weak self] in
       self?.wordLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
