@@ -160,7 +160,7 @@ class ViewController: UIViewController {
     iv.contentMode = .scaleAspectFit
     iv.image = UIImage(named: "keyboard")
     iv.image?.withRenderingMode(.alwaysTemplate)
-    iv.tintColor = Color.buttonColorText
+    iv.tintColor = Color.textColor
     iv.isUserInteractionEnabled = true
     iv.setContentHuggingPriority(.required, for: .horizontal)
     return iv
@@ -262,7 +262,7 @@ class ViewController: UIViewController {
   }()
   private func isRandomWordFetchSuccessful() -> Bool {
     guard let context = container?.viewContext else { return false }
-    fetchedWord = try? ManagedWord.fetchRandomWord(with: level, in: context)
+    fetchedWord = try? ManagedWord.fetchWord(with: level, in: context)
     return fetchedWord != nil
   }
   
@@ -549,7 +549,8 @@ class ViewController: UIViewController {
   }
   
   func initPlayer() {
-    if let word = word { AudioPlayer.shared.initPlayer(with: word.audio!) }
+    guard let word = word, let audio = word.audio else { return }
+    AudioPlayer.shared.initPlayer(with: audio)
   }
   
   @objc func keyboardChanged(_ sender: UISegmentedControl) {
@@ -789,7 +790,9 @@ class ViewController: UIViewController {
                 if !successful {
                   self?.word = Word(text: text, definition: self!.definition, audio: nil)
                 }
-                self?.isFromSpeechService = !successful
+                //for use when audio from API is available
+                //self?.isFromSpeechService = !successful
+                self?.isFromSpeechService = true
                 self?.changeUIStateAfterFetch(true)
                 self?.definitionCollectionView.reloadData()
                 self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
@@ -918,8 +921,9 @@ class ViewController: UIViewController {
               return
             }
             if let audio = item.phonetics.first?.audio {
-              self?.word = Word(text: fetchedWord, definition: self!.definition, audio: audio)
-              self?.initPlayer()
+              self?.word = Word(text: fetchedWord, definition: self!.definition, audio: nil)
+              //if audio is available from API
+              //self?.initPlayer()
               completion(true)
             } else {
               completion(false)
