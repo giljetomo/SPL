@@ -42,6 +42,7 @@
 		52D55DA226A75491000F6006 /* HeartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55DA126A75490000F6006 /* HeartButton.swift */; };
 		52D55DAD26AB70F8000F6006 /* LevelMenuLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55DAC26AB70EA000F6006 /* LevelMenuLauncher.swift */; };
 		52D55DB026AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55DAF26AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift */; };
+		52D55DC126AFCC55000F6006 /* UIColor+HEX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55DC026AFCC55000F6006 /* UIColor+HEX.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +83,7 @@
 		52D55DA126A75490000F6006 /* HeartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartButton.swift; sourceTree = "<group>"; };
 		52D55DAC26AB70EA000F6006 /* LevelMenuLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelMenuLauncher.swift; sourceTree = "<group>"; };
 		52D55DAF26AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelMenuCollectionViewCell.swift; sourceTree = "<group>"; };
+		52D55DC026AFCC55000F6006 /* UIColor+HEX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+HEX.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +169,7 @@
 			children = (
 				52D55D9B26A67E78000F6006 /* FetchedResultsTableViewController.swift */,
 				52D55DA126A75490000F6006 /* HeartButton.swift */,
+				52D55DC026AFCC55000F6006 /* UIColor+HEX.swift */,
 				52ACA065267D210800E1F86A /* UILabel+boldRegularText.swift */,
 				5244D0CB2682650400BFAF6B /* AnimationUtility.swift */,
 				52ACA05A267BBEB900E1F86A /* UIPaddedLabel.swift */,
@@ -275,6 +278,7 @@
 				52ACA04326783CFC00E1F86A /* Word.swift in Sources */,
 				52D55D9626A638EF000F6006 /* ProfileTableViewController.swift in Sources */,
 				52D55D9C26A67E78000F6006 /* FetchedResultsTableViewController.swift in Sources */,
+				52D55DC126AFCC55000F6006 /* UIColor+HEX.swift in Sources */,
 				5244D0CC2682650400BFAF6B /* AnimationUtility.swift in Sources */,
 				524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */,
 				52D55DAD26AB70F8000F6006 /* LevelMenuLauncher.swift in Sources */,

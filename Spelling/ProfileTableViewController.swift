@@ -9,10 +9,16 @@ import UIKit
 import CoreData
 import SafariServices
 
+protocol ProfileTableViewControllerDelegate: class {
+  func favoriteStatusChanged()
+}
+
 class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRecognizerDelegate {
   
   var filter: Filter = .spelled
-
+  weak var delegate: ProfileTableViewControllerDelegate?
+  var currentWord: String?
+  
   var searchTextPredicate: NSPredicate {
     let searchText = searchController.searchBar.text ?? ""
     let andPredicate = NSPredicate(format: "text CONTAINS[cd] %@", searchText)
@@ -78,6 +84,8 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    tableView.sectionIndexColor = Color.textColor
+    tableView.backgroundColor = Color.tableviewColor
     navigationItem.titleView = hStackView
     navigationItem.searchController = searchController
     searchController.searchResultsUpdater = self
@@ -86,6 +94,9 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
     filterChanged(self.countSegmentedControl)
   }
   
+  override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) { searchController.isActive = true }
+  override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { searchController.isActive = false }
+
   fileprivate func setLabelCount() {
     do {
       guard let count = try? fetchedResultsController.managedObjectContext.count(for: request) else { return }
@@ -129,6 +140,9 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
       word.isFavorite.toggle()
       try? self.fetchedResultsController.managedObjectContext.save()
       self.setLabelCount()
+  
+      guard let currentWord = self.currentWord, currentWord == word.text else { return }
+      self.delegate?.favoriteStatusChanged()
     }
   }
   
@@ -154,8 +168,11 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
     button.setImage(UIImage(named: word.isFavorite ? "heart_filled" : "heart"), for: .normal)
     button.sizeToFit()
     button.addTarget(self, action: #selector(heartTapped(_:)), for: .touchUpInside)
-    cell.accessoryView = button
     cell.textLabel?.text = word.text
+    cell.textLabel?.textColor = Color.textColor
+    cell.accessoryView = button
+    cell.accessoryView?.tintColor = Color.textColor
+    cell.backgroundColor = Color.tableviewColor
     return cell
   }
   

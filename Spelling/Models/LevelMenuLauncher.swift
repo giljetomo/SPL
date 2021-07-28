@@ -14,13 +14,13 @@ protocol LevelMenuLauncherDelegate: class {
 class LevelMenuLauncher: NSObject {
   
   var windowHeight: CGFloat?
-  let levels = ["Traveller", "Immigrant", "Citizen", "President"]
+  let levels = ["Traveller", "Citizen", "Immigrant", "President"]
   weak var delegate: LevelMenuLauncherDelegate?
   var selectedLevel: Level?
-    
+
   lazy var menuCollectionView: UICollectionView = {
     let cv = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    cv.backgroundColor = .white
+    cv.backgroundColor = Color.buttonColorBackground
     cv.clipsToBounds = true
     cv.layer.cornerRadius = 12
     cv.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
@@ -47,10 +47,7 @@ class LevelMenuLauncher: NSObject {
       UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut) {
         self.blackView.alpha = 1
         self.menuCollectionView.frame = CGRect(x: 0, y: windowHeight - height, width: self.menuCollectionView.frame.width, height: self.menuCollectionView.frame.height)
-      } completion: { (_) in
-        
       }
-      
     }
   }
   
@@ -109,7 +106,11 @@ extension LevelMenuLauncher: UICollectionViewDelegate, UICollectionViewDataSourc
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LevelMenuCollectionViewCell.reuseIdentifier, for: indexPath) as! LevelMenuCollectionViewCell
     let item = levels[indexPath.item]
-    cell.label.text = item
+    
+    guard let level = Level(rawValue: item.lowercased()) else { return cell }
+    
+    cell.label.text = item.uppercased()
+    cell.subLabel.text = "\(level.range.lowerBound) to \(level.range.upperBound) letters"
     return cell
   }
   

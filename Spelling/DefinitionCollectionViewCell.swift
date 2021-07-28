@@ -7,6 +7,8 @@
 
 import UIKit
 
+
+
 class DefinitionCollectionViewCell: UICollectionViewCell {
   static var isFirstLoadDone: Bool?
   static let reuseIdentifier = "DefinitionCollectionViewCell"
@@ -19,9 +21,9 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
     lbl.textAlignment = .center
     lbl.layer.masksToBounds = true
     lbl.layer.cornerRadius = 5
-    lbl.font = UIFont.preferredFont(forTextStyle: .title3)
     lbl.adjustsFontForContentSizeCategory = true
     lbl.adjustsFontSizeToFitWidth = true
+    lbl.textColor = Color.textColor
     return lbl
   }()
   
