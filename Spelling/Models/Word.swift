@@ -24,6 +24,6 @@ struct Word {
     let newText = str.prefix(count)
     let asterisks = String(repeating: "*", count: count)
 
-    return text.lowercased().replacingOccurrences(of: newText, with: asterisks)
+    return text.replacingOccurrences(of: newText, with: asterisks, options: .caseInsensitive)
   }
 }

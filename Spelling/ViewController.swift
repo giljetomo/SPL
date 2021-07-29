@@ -10,6 +10,7 @@ import Foundation
 import AVFoundation
 import CoreData
 import SafariServices
+import BuyMeACoffee
 
 class ViewController: UIViewController {
   
@@ -77,15 +78,25 @@ class ViewController: UIViewController {
   var keyboardCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   
   lazy var levelTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(launchLevelMenu))
+  let levelView: UIView = {
+    let v = UIView()
+    v.translatesAutoresizingMaskIntoConstraints = false
+    v.layer.cornerRadius = 5
+    v.backgroundColor = Color.buttonColorBackground
+    v.layer.masksToBounds = false
+    v.layer.shadowRadius = 2
+    v.layer.shadowColor = Color.textColor.cgColor
+    v.layer.shadowOpacity = 0.5
+    v.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
+    return v
+  }()
   lazy var levelLabel: UILabel = {
-    let lbl = UIPaddedLabel(top: 5, bottom: 5, left: 8, right: 8)
+    let lbl = UIPaddedLabel(top: 3, bottom: 3, left: 6, right: 6)
     lbl.translatesAutoresizingMaskIntoConstraints = false
     lbl.text = self.level.rawValue.uppercased()
     lbl.font = .preferredFont(forTextStyle: .headline)
     lbl.adjustsFontSizeToFitWidth = true
-    lbl.layer.masksToBounds = true
-    lbl.layer.cornerRadius = 5
-    lbl.backgroundColor = .white
+    lbl.textColor = Color.buttonColorText
     lbl.textAlignment = .center
     lbl.isUserInteractionEnabled = true
     return lbl
@@ -95,8 +106,9 @@ class ViewController: UIViewController {
     let iv = UIImageView()
     iv.translatesAutoresizingMaskIntoConstraints = false
     iv.image = UIImage(named: "audio")
+    iv.image?.withRenderingMode(.alwaysTemplate)
     iv.contentMode = .scaleAspectFit
-    iv.tintColor = .systemBlue
+    iv.tintColor = Color.buttonColorText
     iv.isUserInteractionEnabled = true
     return iv
   }()
@@ -122,6 +134,7 @@ class ViewController: UIViewController {
     s.addTarget(self, action: #selector(changeSlider(_:)), for: .touchDown)
     s.addTarget(self, action: #selector(adjustVolume(_:)), for: .touchUpInside)
     s.addTarget(self, action: #selector(adjustVolume(_:)), for: .touchUpOutside)
+    s.tintColor = Color.textColor
     return s
   }()
   var keyboardPosition = CGPoint(x: 0, y: 0)
@@ -130,11 +143,15 @@ class ViewController: UIViewController {
   let keyboardView: UIView = {
     let v = UIView()
     v.translatesAutoresizingMaskIntoConstraints = false
-    v.clipsToBounds = true
     v.layer.cornerRadius = 5
     v.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
-    v.backgroundColor = .lightGray
+    v.backgroundColor = Color.buttonColorBackground
     v.isUserInteractionEnabled = true
+    v.layer.masksToBounds = false
+    v.layer.shadowRadius = 2
+    v.layer.shadowColor = Color.textColor.cgColor
+    v.layer.shadowOpacity = 0.5
+    v.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
     return v
   }()
   lazy var keyboardImageView: UIImageView = {
@@ -143,7 +160,8 @@ class ViewController: UIViewController {
     iv.heightAnchor.constraint(equalToConstant: keyboardSegmentedControl.intrinsicContentSize.height).isActive = true
     iv.contentMode = .scaleAspectFit
     iv.image = UIImage(named: "keyboard")
-    iv.tintColor = .black
+    iv.image?.withRenderingMode(.alwaysTemplate)
+    iv.tintColor = Color.buttonColorText
     iv.isUserInteractionEnabled = true
     iv.setContentHuggingPriority(.required, for: .horizontal)
     return iv
@@ -165,12 +183,14 @@ class ViewController: UIViewController {
     let items = ["Keyboard","Shuffled","Concealed"]
     let sc = UISegmentedControl(items: items)
     let font = UIFont.preferredFont(forTextStyle: .body)
-    sc.setTitleTextAttributes([NSAttributedString.Key.font: font], for: .normal)
+    sc.setTitleTextAttributes([NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: Color.textColor], for: .normal)
+    sc.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: Color.screenColor], for: .selected)
     sc.apportionsSegmentWidthsByContent = true
     sc.selectedSegmentIndex = 0
-    sc.layer.cornerRadius = 8
     sc.isHidden = true
     sc.addTarget(self, action: #selector(keyboardChanged(_:)), for: .valueChanged)
+    sc.selectedSegmentTintColor = Color.textColor
+    sc.backgroundColor = Color.screenColor
     return sc
   }()
   let dictionButton: UIButton = {
@@ -180,12 +200,16 @@ class ViewController: UIViewController {
     btn.titleLabel?.adjustsFontSizeToFitWidth = true
     btn.translatesAutoresizingMaskIntoConstraints = false
     btn.contentMode = .scaleAspectFit
-    btn.setTitleColor(.black, for: .normal)
+    btn.setTitleColor(Color.buttonColorText, for: .normal)
     btn.addTarget(self, action: #selector(changeDiction(_:)), for: .touchUpInside)
-    btn.backgroundColor = .white
+    btn.backgroundColor = Color.buttonColorBackground
     btn.layer.cornerRadius = 5
-    btn.layer.masksToBounds = true
-    btn.contentEdgeInsets = .init(top: 5, left: 7, bottom: 5, right: 7)
+    btn.layer.masksToBounds = false
+    btn.layer.shadowRadius = 2
+    btn.layer.shadowColor = Color.textColor.cgColor
+    btn.layer.shadowOpacity = 0.5
+    btn.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
+    btn.contentEdgeInsets = .init(top: 3, left: 6, bottom: 3, right: 6)
     return btn
   }()
   
@@ -206,26 +230,87 @@ class ViewController: UIViewController {
   let nextAndSubmitButton: UIButton = {
     let btn = UIButton()
     btn.setTitle("Submit", for: .normal)
+    btn.titleLabel?.font = .preferredFont(forTextStyle: .headline)
     btn.translatesAutoresizingMaskIntoConstraints = false
-    btn.setTitleColor(.systemBlue, for: .normal)
     btn.isHidden = true
     btn.addTarget(self, action: #selector(fetchNextWord(_:)), for: .touchUpInside)
+    btn.setTitleColor(Color.buttonColorText, for: .normal)
+    btn.backgroundColor = Color.buttonColorBackground
+    btn.layer.cornerRadius = 5
+    btn.layer.masksToBounds = false
+    btn.layer.shadowRadius = 2
+    btn.layer.shadowColor = Color.textColor.cgColor
+    btn.layer.shadowOpacity = 0.5
+    btn.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
+    btn.contentEdgeInsets = .init(top: 9, left: 9, bottom: 9, right: 9)
     return btn
   }()
   lazy var profileTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewProfile))
   let profileImageView: UIImageView = {
     let iv = UIImageView()
     iv.translatesAutoresizingMaskIntoConstraints = false
-    iv.contentMode = .scaleAspectFit
     iv.image = UIImage(named: "profile")
-    iv.tintColor = .black
+    iv.contentMode = .scaleAspectFit
+    iv.image?.withRenderingMode(.alwaysTemplate)
+    iv.tintColor = Color.textColor
     iv.isUserInteractionEnabled = true
     return iv
   }()
+  lazy var infoLabelHeight = infoLabel.intrinsicContentSize.height
+  lazy var infoLabelView: UIView = {
+    let v = UIView()
+    v.frame = infoLabelShadowView.bounds
+    v.translatesAutoresizingMaskIntoConstraints = false
+    v.heightAnchor.constraint(equalToConstant: infoLabelHeight).isActive = true
+    v.widthAnchor.constraint(equalTo: v.heightAnchor, multiplier: 1).isActive = true
+    v.layer.cornerRadius = infoLabelHeight / 2.0
+    v.layer.masksToBounds = true
+    return v
+  }()
+  lazy var infoLabeTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(launchInfoView))
+  lazy var infoLabelShadowView: UIView = {
+    let infoLabelHeight = infoLabel.intrinsicContentSize.height
+    let v = UIView()
+    v.translatesAutoresizingMaskIntoConstraints = false
+    v.heightAnchor.constraint(equalToConstant: infoLabelHeight).isActive = true
+    v.widthAnchor.constraint(equalTo: v.heightAnchor, multiplier: 1).isActive = true
+    v.backgroundColor = UIColor.clear
+    v.layer.masksToBounds = false
+    v.layer.shadowRadius = 2
+    v.layer.shadowColor = Color.textColor.cgColor
+    v.layer.shadowOpacity = 0.5
+    v.layer.shadowOffset = CGSize(width: 0, height: 1.0)
+    return v
+  }()
+  let infoLabel: UIPaddedLabel = {
+    let lbl = UIPaddedLabel(top: 3, bottom: 3, left: 0, right: 0)
+    lbl.translatesAutoresizingMaskIntoConstraints = false
+    lbl.text = "❔"
+    lbl.font = UIFont.preferredFont(forTextStyle: .title3)
+    lbl.adjustsFontSizeToFitWidth = true
+    lbl.backgroundColor = Color.buttonColorText
+    lbl.textAlignment = .center
+    return lbl
+  }()
+  
   private func isRandomWordFetchSuccessful() -> Bool {
     guard let context = container?.viewContext else { return false }
-    fetchedWord = try? ManagedWord.fetchRandomWord(with: level, in: context)
+    fetchedWord = try? ManagedWord.fetchWord(with: level, in: context)
     return fetchedWord != nil
+  }
+  
+  let infoLauncher = InfoLauncher()
+  
+  @objc func launchInfoView() {
+    UIView.animate(withDuration: 0.20) { [weak self] in
+      self?.infoLabelShadowView.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+    } completion: { (_) in
+      UIView.animate(withDuration: 0.10) { [weak self] in
+        self?.infoLabelShadowView.transform = .identity
+      } completion: { [weak self] (_) in
+        self?.infoLauncher.showInfo()
+      }
+    }
   }
   
   @objc func viewProfile() {
@@ -235,7 +320,10 @@ class ViewController: UIViewController {
       UIView.animate(withDuration: 0.10) { [weak self] in
         self?.profileImageView.transform = .identity
       } completion: { [weak self] (_) in
-        self?.present(UINavigationController(rootViewController: ProfileTableViewController()), animated: true, completion: nil)
+        let profileVC = ProfileTableViewController()
+        profileVC.delegate = self
+        profileVC.currentWord = self?.fetchedWord?.text
+        self?.present(UINavigationController(rootViewController: profileVC), animated: true, completion: nil)
       }
     }
   }
@@ -259,7 +347,9 @@ class ViewController: UIViewController {
   }
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = UIColor(named: "White")
+    view.backgroundColor = Color.screenColor
+    
+    BMCManager.shared.presentingViewController = self
     
     //    if let context = container?.viewContext {
     //      ManagedWord.preloadData(in: context)
@@ -269,7 +359,8 @@ class ViewController: UIViewController {
     print(text)
     fetchWordAPI(with: country) {(successful) in
       DispatchQueue.main.async { [weak self] in
-        self?.isFromSpeechService = !successful
+        //self?.isFromSpeechService = !successful
+        self?.isFromSpeechService = true
         if !successful {
           self?.word = Word(text: text, definition: self!.definition, audio: nil)
         }
@@ -292,12 +383,13 @@ class ViewController: UIViewController {
     definitionCollectionView.register(DefinitionCollectionViewCell.self, forCellWithReuseIdentifier: DefinitionCollectionViewCell.reuseIdentifier)
     definitionCollectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.reuseIdentifier)
     keyboardCollectionView.register(KeyboardCollectionViewCell.self, forCellWithReuseIdentifier: KeyboardCollectionViewCell.reuseIdentifier)
-    definitionCollectionView.backgroundColor = UIColor(named: "White")
-    keyboardCollectionView.backgroundColor = UIColor(named: "White")
+    definitionCollectionView.backgroundColor = Color.screenColor
+    keyboardCollectionView.backgroundColor = Color.screenColor
     setupViewLayout()
     
     NotificationCenter.default.addObserver(self, selector: #selector(changeAudioState), name: .playbackEnded, object: nil)
   }
+  
   override func viewDidLayoutSubviews() {
     if keyboardSegmentedControlWidth == nil {
       keyboardSegmentedControlWidth = keyboardSegmentedControl.frame.size.width
@@ -317,10 +409,10 @@ class ViewController: UIViewController {
     guard answerSubmitted && !animationsPlaying else { return }
     
     UIView.animate(withDuration: 0.10) {
-      self.levelLabel.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+      self.levelView.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
     } completion: { (_) in
       UIView.animate(withDuration: 0.10) {
-        self.levelLabel.transform = .identity
+        self.levelView.transform = .identity
       } completion: { (_) in
         self.levelMenuLauncher.showMenu()
       }
@@ -397,29 +489,45 @@ class ViewController: UIViewController {
     view.addSubview(nextAndSubmitButton)
     view.addSubview(keyboardSectionView)
     view.addSubview(profileImageView)
+    view.addSubview(infoLabelShadowView)
     view.addSubview(keyboardBlackView)
     view.addSubview(keyboardView)
-
+    
+    let viewHeight = view.safeAreaLayoutGuide.layoutFrame.size.height
+    let topViewTopAnchor = viewHeight * 0.01
+    let definitionViewTopAnchor = viewHeight * 0.01
+    let audioVStackViewTopAnchor = viewHeight * 0.03
+    let guessLabelViewTopAnchor = viewHeight * 0.03
+    let keyboardSectionViewTopAnchor = viewHeight * 0.03
+    let submitButtonTopAnchor = viewHeight * 0.03
+    
     audioImageView.addGestureRecognizer(playTapRecognizer)
     profileImageView.addGestureRecognizer(profileTapRecognizer)
-    levelLabel.addGestureRecognizer(levelTapRecognizer)
+    levelView.addGestureRecognizer(levelTapRecognizer)
     keyboardBlackView.addGestureRecognizer(keyboardBlackViewTapRecognizer)
+    infoLabelShadowView.addGestureRecognizer(infoLabeTapRecognizer)
     
     topView.addSubview(dictionButton)
     dictionButton.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 8).isActive = true
     dictionButton.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
     
-    topView.addSubview(levelLabel)
-    levelLabel.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -8).isActive = true
-    levelLabel.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
-    levelLabel.heightAnchor.constraint(equalTo: dictionButton.heightAnchor).isActive = true
+    levelView.addSubview(levelLabel)
+    levelLabel.leadingAnchor.constraint(equalTo: levelView.leadingAnchor).isActive = true
+    levelLabel.trailingAnchor.constraint(equalTo: levelView.trailingAnchor).isActive = true
+    levelLabel.topAnchor.constraint(equalTo: levelView.topAnchor).isActive = true
+    levelLabel.bottomAnchor.constraint(equalTo: levelView.bottomAnchor).isActive = true
     
-    topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
+    topView.addSubview(levelView)
+    levelView.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -8).isActive = true
+    levelView.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
+    levelView.heightAnchor.constraint(equalTo: dictionButton.heightAnchor).isActive = true
+    
+    topView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: topViewTopAnchor).isActive = true
     topView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.95).isActive = true
     topView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
     topView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     
-    definitionView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10).isActive = true
+    definitionView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: definitionViewTopAnchor).isActive = true
     definitionView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.90).isActive = true
     definitionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.30).isActive = true
     definitionView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -431,10 +539,10 @@ class ViewController: UIViewController {
     
     audioImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.07).isActive = true
     audioImageView.widthAnchor.constraint(equalTo: audioImageView.heightAnchor, multiplier: 1).isActive = true
-    audioVStackView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: view.frame.height * 0.02).isActive = true
+    audioVStackView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: audioVStackViewTopAnchor).isActive = true
     audioVStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     
-    guessLabelView.topAnchor.constraint(equalTo: audioVStackView.bottomAnchor, constant: 0).isActive = true
+    guessLabelView.topAnchor.constraint(equalTo: audioVStackView.bottomAnchor, constant: guessLabelViewTopAnchor).isActive = true
     guessLabelView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.08).isActive = true
     guessLabelView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 1).isActive = true
     guessLabelView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -444,7 +552,7 @@ class ViewController: UIViewController {
     guessLabel.trailingAnchor.constraint(equalTo: guessLabelView.trailingAnchor, constant: -10).isActive = true
     guessLabel.centerYAnchor.constraint(equalTo: guessLabelView.centerYAnchor).isActive = true
     
-    keyboardSectionView.topAnchor.constraint(equalTo: guessLabelView.bottomAnchor, constant: 10).isActive = true
+    keyboardSectionView.topAnchor.constraint(equalTo: guessLabelView.bottomAnchor, constant: keyboardSectionViewTopAnchor).isActive = true
     keyboardSectionView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.95).isActive = true
     keyboardSectionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.20).isActive = true
     keyboardSectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -478,9 +586,9 @@ class ViewController: UIViewController {
     keyboardHStackView.trailingAnchor.constraint(equalTo: keyboardView.trailingAnchor, constant: -5).isActive = true
     keyboardHStackView.centerYAnchor.constraint(equalTo: keyboardView.centerYAnchor).isActive = true
     keyboardHStackView.leadingAnchor.constraint(equalTo: keyboardView.leadingAnchor, constant: 0).isActive = true
-
     
-    nextAndSubmitButton.topAnchor.constraint(equalTo: keyboardSectionView.bottomAnchor, constant: 20).isActive = true
+    
+    nextAndSubmitButton.topAnchor.constraint(equalTo: keyboardSectionView.bottomAnchor, constant: submitButtonTopAnchor).isActive = true
     nextAndSubmitButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
     
     let width = view.frame.size.width
@@ -490,10 +598,23 @@ class ViewController: UIViewController {
     profileImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
     profileImageView.widthAnchor.constraint(equalTo: profileImageView.heightAnchor, multiplier: 1).isActive = true
     
+    infoLabelShadowView.trailingAnchor.constraint(equalTo: levelView.trailingAnchor).isActive = true
+    infoLabelShadowView.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
+    
+    infoLabelShadowView.addSubview(infoLabelView)
+    infoLabelView.centerYAnchor.constraint(equalTo: infoLabelShadowView.centerYAnchor).isActive = true
+    infoLabelView.centerXAnchor.constraint(equalTo: infoLabelShadowView.centerXAnchor).isActive = true
+
+    infoLabelView.addSubview(infoLabel)
+    infoLabel.leadingAnchor.constraint(equalTo: infoLabelView.leadingAnchor).isActive = true
+    infoLabel.trailingAnchor.constraint(equalTo: infoLabelView.trailingAnchor).isActive = true
+    infoLabel.bottomAnchor.constraint(equalTo: infoLabelView.bottomAnchor).isActive = true
+    infoLabel.topAnchor.constraint(equalTo: infoLabelView.topAnchor).isActive = true
   }
   
   func initPlayer() {
-    if let word = word { AudioPlayer.shared.initPlayer(with: word.audio!) }
+    guard let word = word, let audio = word.audio else { return }
+    AudioPlayer.shared.initPlayer(with: audio)
   }
   
   @objc func keyboardChanged(_ sender: UISegmentedControl) {
@@ -509,13 +630,11 @@ class ViewController: UIViewController {
   
   @objc func keyboardTapped() {
     keyboardViewIsOpen.toggle()
+    keyboardView.removeConstraint(keyboardViewWidthConstraint)
     
-    let constant =
-      keyboardViewIsOpen
-      //      ((keyboardImageViewWidth ?? 0.0) + (keyboardSegmentedControlWidth ?? 0.0))
+    let constant = keyboardViewIsOpen
       ? keyboardImageView.intrinsicContentSize.width + keyboardSegmentedControl.intrinsicContentSize.width
       : (keyboardImageViewWidth ?? 0.0)
-    keyboardView.removeConstraint(keyboardViewWidthConstraint)
     
     UIView.animate(withDuration: 0.40) { [weak self] in
       self?.keyboardBlackView.alpha = self!.keyboardViewIsOpen ? 0.7 : 0.0
@@ -538,9 +657,10 @@ class ViewController: UIViewController {
       keyboardView.transform = CGAffineTransform(translationX: 0, y: translation.y + keyboardPosition.y)
     } else if gesture.state == .ended {
       keyboardPosition.y += translation.y
-      guard keyboardPosition.y < -20 || keyboardPosition.y > 250 else { return }
-      if keyboardPosition.y < -20 { keyboardPosition.y = -20 }
-      else if keyboardPosition.y > 250 { keyboardPosition.y = 250 }
+      
+      guard keyboardPosition.y < -60 || keyboardPosition.y > 180 else { return }
+      if keyboardPosition.y < -60 { keyboardPosition.y = -60 }
+      else if keyboardPosition.y > 180 { keyboardPosition.y = 180 }
       
       UIView.animate(withDuration: 0.5,
                      delay: 0,
@@ -565,7 +685,7 @@ class ViewController: UIViewController {
   }
   
   @objc func adjustVolume(_ sender: UISlider) {
-    sender.alpha = 0.2
+    sender.alpha = 0.20
     UIView.animate(withDuration: 0.40) { [weak self] in
       sender.transform = .identity
       if sender.value == 0.0 {
@@ -585,7 +705,7 @@ class ViewController: UIViewController {
   }
   
   @objc func changeSlider(_ sender: UISlider) {
-    sender.alpha = 1.0
+    sender.alpha = 0.80
     UIView.animate(withDuration: 0.30) { sender.transform = CGAffineTransform(scaleX: 1.3, y: 1.3) }
   }
   
@@ -633,7 +753,9 @@ class ViewController: UIViewController {
   }
   
   fileprivate func setPlayImageViewColor() {
-    audioImageView.tintColor = audioImageView.isUserInteractionEnabled ? .systemBlue : .gray
+    UIView.transition(with: audioImageView, duration: 0.5, options: .transitionCrossDissolve) { [weak self] in
+      self?.audioImageView.tintColor = self!.audioImageView.isUserInteractionEnabled ? Color.textColor : Color.buttonColorBackground
+    }
   }
   
   fileprivate func reloadDefinition(completion: @escaping (_ completed: Bool) -> Void) {
@@ -664,34 +786,44 @@ class ViewController: UIViewController {
   }
   
   @objc func fetchNextWord(_ sender: UIButton) {
-    if sender.title(for: .normal) == "Submit" {
-      answerSubmitted = true
-      nextAndSubmitButton.alpha = 0
-      isFirstLoadWordSection = true
-      keyboardCollectionView.isUserInteractionEnabled = false
-      keyboardView.isUserInteractionEnabled = false
-      animationsPlaying = true
-      changeAudioState()
-      
-      showCorrectWord { (completed) in
-        if completed {
-          DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
-            self?.showHeartButton { (completed) in
+    UIView.animate(withDuration: 0.10) {
+      sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+    } completion: { (_) in
+      UIView.animate(withDuration: 0.10) {
+        sender.transform = .identity
+      } completion: { (_) in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [unowned self] in
+          if sender.title(for: .normal) == "Submit" {
+            answerSubmitted = true
+            nextAndSubmitButton.alpha = 0
+            isFirstLoadWordSection = true
+            keyboardCollectionView.isUserInteractionEnabled = false
+            keyboardView.isUserInteractionEnabled = false
+            animationsPlaying = true
+            changeAudioState()
+            
+            showCorrectWord { (completed) in
               if completed {
-                self?.checkAnswer { (completed) in
-                  if completed {
-                    self?.isFirstLoadDefinitionSection = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(900)) { [weak self] in
-                      self?.reloadDefinition { (completed) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+                  self?.showHeartButton { (completed) in
+                    if completed {
+                      self?.checkAnswer { (completed) in
                         if completed {
-                          self?.changeAudioState()
-                          NotificationCenter.default.post(name: .animationsEnded, object: nil)
-                          DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
-                            UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
-                              sender.setTitle("Next", for: .normal)
-                              sender.alpha = 1
-                            } completion: { (_) in
-                              self?.animationsPlaying.toggle()
+                          self?.isFirstLoadDefinitionSection = false
+                          DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(900)) { [weak self] in
+                            self?.reloadDefinition { (completed) in
+                              if completed {
+                                self?.changeAudioState()
+                                NotificationCenter.default.post(name: .animationsEnded, object: nil)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300)) {
+                                  UIView.transition(with: sender, duration: 1.0, options: .transitionCrossDissolve) {
+                                    sender.setTitle("Next", for: .normal)
+                                    sender.alpha = 1
+                                  } completion: { (_) in
+                                    self?.animationsPlaying.toggle()
+                                  }
+                                }
+                              }
                             }
                           }
                         }
@@ -701,79 +833,94 @@ class ViewController: UIViewController {
                 }
               }
             }
+          } else {
+            sender.isHidden = true
+            guessLabel.alpha = 1.0
+            keyboardCollectionView.isUserInteractionEnabled = true
+            answerSubmitted = false
+            isLiked = false
+            didChangeDiction = false
+            partOfSpeech.removeAll()
+            guessLabel.text?.removeAll()
+            isFirstLoadDefinitionSection = true
+            WordCollectionViewCell.allAnimationsLoaded = nil
+            DefinitionCollectionViewCell.isFirstLoadDone = nil
+            
+            guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
+            print(text)
+            
+            fetchWordAPI(with: country) { (successful) in
+              DispatchQueue.main.async { [weak self] in
+                if !successful {
+                  self?.word = Word(text: text, definition: self!.definition, audio: nil)
+                }
+                //for use when audio from API is available
+                //self?.isFromSpeechService = !successful
+                self?.isFromSpeechService = true
+                self?.changeUIStateAfterFetch(true)
+                self?.definitionCollectionView.reloadData()
+                self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
+                
+                if self!.keyboardOption != .keyboard { self?.keyboardCollectionView.reloadData() }
+//                sender.isHidden.toggle()
+              }
+            }
           }
-        }
-      }
-    } else {
-      sender.isEnabled = false
-      keyboardCollectionView.isUserInteractionEnabled = true
-      answerSubmitted = false
-      isLiked = false
-      didChangeDiction = false
-      partOfSpeech.removeAll()
-      guessLabel.text?.removeAll()
-      isFirstLoadDefinitionSection = true
-      WordCollectionViewCell.allAnimationsLoaded = nil
-      DefinitionCollectionViewCell.isFirstLoadDone = nil
-      
-      guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
-      print(text)
-      
-      fetchWordAPI(with: country) { (successful) in
-        DispatchQueue.main.async { [weak self] in
-          if !successful {
-            self?.word = Word(text: text, definition: self!.definition, audio: nil)
-          }
-          self?.isFromSpeechService = !successful
-          self?.changeUIStateAfterFetch(true)
-          self?.definitionCollectionView.reloadData()
-          self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
-          
-          if self!.keyboardOption != .keyboard { self?.keyboardCollectionView.reloadData() }
-          sender.isEnabled.toggle()
         }
       }
     }
   }
-  
+
   private func checkAnswer(completion: @escaping (_ completed: Bool) -> Void) {
     CATransaction.begin()
     CATransaction.setCompletionBlock { completion(true) }
     
     guard let text = fetchedWord?.text, let context = container?.viewContext else { return }
     let isCorrect = text == guessLabel.text
-    
-    if isCorrect {
-      UIView.transition(with: guessLabel, duration: 0.8, options: .transitionFlipFromTop) { [weak self] in
-        UIView.animate(withDuration: 0.10) {
-          self?.guessLabel.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
-        } completion: { (_) in
-          UIView.animate(withDuration: 0.20) {
-            self?.guessLabel.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-          } completion: { (_) in
-            UIView.animate(withDuration: 0.5) {
-              self?.guessLabel.transform = .identity
-            }
-          }
-        }
-      }
-    } else {
-      DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) { [unowned self] in
-        let animation = CABasicAnimation(keyPath: "position")
-        animation.duration = 0.05
-        animation.repeatCount = 4
-        animation.autoreverses = true
-        animation.fromValue = NSValue(cgPoint: CGPoint(x: self.guessLabel.center.x - 12, y: self.guessLabel.center.y))
-        animation.toValue = NSValue(cgPoint: CGPoint(x: self.guessLabel.center.x + 12, y: self.guessLabel.center.y))
-        self.guessLabel.layer.add(animation, forKey: "position")
-      }
-    }
+   
     //frc deletes the entry from the tableview if the state update is performed in the background thread.
     context.perform {
       let word = try? ManagedWord.findWord(text, in: context)
       word?.state = isCorrect ? .spelled : .misspelled
+      try? context.save()
     }
-    try? context.save()
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [unowned self] in
+      if isCorrect {
+        UIView.transition(with: guessLabel, duration: 0.8, options: .transitionFlipFromTop) { [weak self] in
+          UIView.animate(withDuration: 0.10) {
+            self?.guessLabel.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+          } completion: { (_) in
+            UIView.animate(withDuration: 0.20) {
+              self?.guessLabel.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+            } completion: { (_) in
+              UIView.animate(withDuration: 0.5) {
+                self?.guessLabel.transform = .identity
+              }
+            }
+          }
+        }
+      } else {
+        CATransaction.begin()
+        CATransaction.setCompletionBlock {
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            UIView.animate(withDuration: 0.5) {
+              self.guessLabel.alpha = 0.5
+            }
+          }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) { [unowned self] in
+          let animation = CABasicAnimation(keyPath: "position")
+          animation.duration = 0.05
+          animation.repeatCount = 4
+          animation.autoreverses = true
+          animation.fromValue = NSValue(cgPoint: CGPoint(x: self.guessLabel.center.x - 12, y: self.guessLabel.center.y))
+          animation.toValue = NSValue(cgPoint: CGPoint(x: self.guessLabel.center.x + 12, y: self.guessLabel.center.y))
+          self.guessLabel.layer.add(animation, forKey: "position")
+        }
+        CATransaction.commit()
+      }
+    }
     CATransaction.commit()
   }
   
@@ -784,6 +931,7 @@ class ViewController: UIViewController {
     
     country.toggle()
     didChangeDiction = true
+    sender.layer.shadowOpacity = 0
     
     UIView.animate(withDuration: 0.15) {
       sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
@@ -793,8 +941,9 @@ class ViewController: UIViewController {
       } completion: { (_) in
         UIView.transition(with: sender, duration: 0.5, options: .transitionFlipFromTop) {
           sender.setTitle(title, for: .normal)
+          sender.layer.shadowOpacity = 0.5
         } completion: { (_) in
-          DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard !self!.isFromSpeechService else {
               self?.changeUIStateAfterFetch(true)
               return
@@ -806,12 +955,7 @@ class ViewController: UIViewController {
           }
         }
       }
-
     }
-
-
-
-
     
   }
   
@@ -841,8 +985,9 @@ class ViewController: UIViewController {
               return
             }
             if let audio = item.phonetics.first?.audio {
-              self?.word = Word(text: fetchedWord, definition: self!.definition, audio: audio)
-              self?.initPlayer()
+              self?.word = Word(text: fetchedWord, definition: self!.definition, audio: nil)
+              //if audio is available from API
+              //self?.initPlayer()
               completion(true)
             } else {
               completion(false)
@@ -937,8 +1082,6 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
           AnimationUtility.viewSlideInFromTop(toBottom: cell)
         })
         
-        
-        
         guard let word = word?.definition
         else {
           cell.setup(with: "Error:", and: "Please press next")
@@ -989,12 +1132,6 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     }
   }
   
-//  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//    if collectionView == keyboardCollectionView {
-//      return CGSize(width: (keyboardSectionView.frame.width/9)-5, height: (keyboardSectionView.frame.width/9)-5)
-//    }
-//    return .zero
-//  }
   private func searchInSafari() {
     guard let url = word?.searchURL else { return }
     let safariVC = SFSafariViewController(url: url)
@@ -1027,7 +1164,7 @@ extension ViewController: KeyboardCollectionViewCellDelegate {
 // MARK: - WordCollectionViewCellDelegate
 extension ViewController: WordCollectionViewCellDelegate {
   func isWordLiked(status: Bool) {
-  
+    
     guard let context = container?.viewContext, let text = fetchedWord?.text else { return }
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
       self?.isLiked = status
@@ -1044,8 +1181,16 @@ extension ViewController: LevelMenuLauncherDelegate {
     guard self.level != level else { return }
     self.level = level
     
-    UIView.transition(with: levelLabel, duration: 0.5, options: .transitionFlipFromTop) {
+    UIView.transition(with: levelView, duration: 0.5, options: .transitionFlipFromTop) {
       self.levelLabel.text = self.level.rawValue.uppercased()
     }
+  }
+}
+
+extension ViewController: ProfileTableViewControllerDelegate {
+  func favoriteStatusChanged() {
+    guard answerSubmitted else { return }
+    isLiked.toggle()
+    definitionCollectionView.reloadSections([0])
   }
 }

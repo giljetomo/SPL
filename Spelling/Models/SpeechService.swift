@@ -13,11 +13,6 @@ class SpeechService: NSObject {
   private var speechService = AVSpeechSynthesizer()
   private var utterance: AVSpeechUtterance?
   
-  enum Voices: String {
-    case US = "com.apple.ttsbundle.siri_female_en-US_premium"
-    case UK = "com.apple.ttsbundle.Daniel-premium"
-  }
-  
   override private init() {
     super.init()
     speechService.delegate = self
@@ -62,4 +57,12 @@ extension SpeechService: AVSpeechSynthesizerDelegate {
     self.utterance = nil
     NotificationCenter.default.post(name: .playbackEnded, object: nil)
   }
+}
+
+enum Voices: String {
+  case US = "com.apple.ttsbundle.Tom-premium"
+          //"com.apple.ttsbundle.Allison-premium"
+          //"com.apple.ttsbundle.Ava-premium"
+          //"com.apple.ttsbundle.siri_female_en-US_premium"
+  case UK = "com.apple.ttsbundle.Daniel-premium"
 }

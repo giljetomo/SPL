@@ -27,6 +27,7 @@ class WordCollectionViewCell: UICollectionViewCell {
     lbl.font = UIFont.preferredFont(forTextStyle: .largeTitle)
     lbl.adjustsFontForContentSizeCategory = true
     lbl.adjustsFontSizeToFitWidth = true
+    lbl.textColor = Color.textColor
     lbl.textAlignment = .center
     lbl.isUserInteractionEnabled = true
     return lbl
@@ -43,7 +44,8 @@ class WordCollectionViewCell: UICollectionViewCell {
     iv.translatesAutoresizingMaskIntoConstraints = false
     iv.image = UIImage(named: "heart")
     iv.contentMode = .scaleAspectFill
-    iv.tintColor = .darkGray
+    iv.tintColor = Color.textColor
+    iv.tintAdjustmentMode = .normal
     iv.isUserInteractionEnabled = true
     return iv
   }()

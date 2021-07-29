@@ -1,0 +1,16 @@
+PODS:
+  - BuyMeACoffee (1.0.5)
+
+DEPENDENCIES:
+  - BuyMeACoffee (~> 1.0)
+
+SPEC REPOS:
+  trunk:
+    - BuyMeACoffee
+
+SPEC CHECKSUMS:
+  BuyMeACoffee: 604c6e19659c507786a673c99cd90130c60bdf57
+
+PODFILE CHECKSUM: 3e43395a2ca9fd5e2ef35ea2cd7e207b3fdc9f72
+
+COCOAPODS: 1.10.1

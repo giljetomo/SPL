@@ -7,12 +7,14 @@
 
 import UIKit
 import CoreData
+import BuyMeACoffee
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
   
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
+    BMCManager.shared.configure(username: "giomo")
     return true
   }
   
