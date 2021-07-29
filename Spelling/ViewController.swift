@@ -160,7 +160,7 @@ class ViewController: UIViewController {
     iv.contentMode = .scaleAspectFit
     iv.image = UIImage(named: "keyboard")
     iv.image?.withRenderingMode(.alwaysTemplate)
-    iv.tintColor = Color.textColor
+    iv.tintColor = Color.buttonColorText
     iv.isUserInteractionEnabled = true
     iv.setContentHuggingPriority(.required, for: .horizontal)
     return iv
@@ -253,17 +253,63 @@ class ViewController: UIViewController {
     iv.image?.withRenderingMode(.alwaysTemplate)
     iv.tintColor = Color.textColor
     iv.isUserInteractionEnabled = true
-    iv.layer.masksToBounds = false
-    iv.layer.shadowRadius = 2
-    iv.layer.shadowColor = Color.textColor.cgColor
-    iv.layer.shadowOpacity = 0.5
-    iv.layer.shadowOffset = CGSize(width: 1.0, height: 1.0)
     return iv
   }()
+  lazy var infoLabelHeight = infoLabel.intrinsicContentSize.height
+  lazy var infoLabelView: UIView = {
+    let v = UIView()
+    v.frame = infoLabelShadowView.bounds
+    v.translatesAutoresizingMaskIntoConstraints = false
+    v.heightAnchor.constraint(equalToConstant: infoLabelHeight).isActive = true
+    v.widthAnchor.constraint(equalTo: v.heightAnchor, multiplier: 1).isActive = true
+    v.layer.cornerRadius = infoLabelHeight / 2.0
+    v.layer.masksToBounds = true
+    return v
+  }()
+  lazy var infoLabeTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(launchInfoView))
+  lazy var infoLabelShadowView: UIView = {
+    let infoLabelHeight = infoLabel.intrinsicContentSize.height
+    let v = UIView()
+    v.translatesAutoresizingMaskIntoConstraints = false
+    v.heightAnchor.constraint(equalToConstant: infoLabelHeight).isActive = true
+    v.widthAnchor.constraint(equalTo: v.heightAnchor, multiplier: 1).isActive = true
+    v.backgroundColor = UIColor.clear
+    v.layer.masksToBounds = false
+    v.layer.shadowRadius = 2
+    v.layer.shadowColor = Color.textColor.cgColor
+    v.layer.shadowOpacity = 0.5
+    v.layer.shadowOffset = CGSize(width: 0, height: 1.0)
+    return v
+  }()
+  let infoLabel: UIPaddedLabel = {
+    let lbl = UIPaddedLabel(top: 3, bottom: 3, left: 0, right: 0)
+    lbl.translatesAutoresizingMaskIntoConstraints = false
+    lbl.text = "❔"
+    lbl.font = UIFont.preferredFont(forTextStyle: .title3)
+    lbl.adjustsFontSizeToFitWidth = true
+    lbl.backgroundColor = Color.buttonColorText
+    lbl.textAlignment = .center
+    return lbl
+  }()
+  
   private func isRandomWordFetchSuccessful() -> Bool {
     guard let context = container?.viewContext else { return false }
     fetchedWord = try? ManagedWord.fetchWord(with: level, in: context)
     return fetchedWord != nil
+  }
+  
+  let infoLauncher = InfoLauncher()
+  
+  @objc func launchInfoView() {
+    UIView.animate(withDuration: 0.20) { [weak self] in
+      self?.infoLabelShadowView.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+    } completion: { (_) in
+      UIView.animate(withDuration: 0.10) { [weak self] in
+        self?.infoLabelShadowView.transform = .identity
+      } completion: { [weak self] (_) in
+        self?.infoLauncher.showInfo()
+      }
+    }
   }
   
   @objc func viewProfile() {
@@ -310,7 +356,8 @@ class ViewController: UIViewController {
     print(text)
     fetchWordAPI(with: country) {(successful) in
       DispatchQueue.main.async { [weak self] in
-        self?.isFromSpeechService = !successful
+        //self?.isFromSpeechService = !successful
+        self?.isFromSpeechService = true
         if !successful {
           self?.word = Word(text: text, definition: self!.definition, audio: nil)
         }
@@ -439,6 +486,7 @@ class ViewController: UIViewController {
     view.addSubview(nextAndSubmitButton)
     view.addSubview(keyboardSectionView)
     view.addSubview(profileImageView)
+    view.addSubview(infoLabelShadowView)
     view.addSubview(keyboardBlackView)
     view.addSubview(keyboardView)
     
@@ -454,6 +502,7 @@ class ViewController: UIViewController {
     profileImageView.addGestureRecognizer(profileTapRecognizer)
     levelView.addGestureRecognizer(levelTapRecognizer)
     keyboardBlackView.addGestureRecognizer(keyboardBlackViewTapRecognizer)
+    infoLabelShadowView.addGestureRecognizer(infoLabeTapRecognizer)
     
     topView.addSubview(dictionButton)
     dictionButton.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 8).isActive = true
@@ -546,6 +595,18 @@ class ViewController: UIViewController {
     profileImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
     profileImageView.widthAnchor.constraint(equalTo: profileImageView.heightAnchor, multiplier: 1).isActive = true
     
+    infoLabelShadowView.trailingAnchor.constraint(equalTo: levelView.trailingAnchor).isActive = true
+    infoLabelShadowView.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
+    
+    infoLabelShadowView.addSubview(infoLabelView)
+    infoLabelView.centerYAnchor.constraint(equalTo: infoLabelShadowView.centerYAnchor).isActive = true
+    infoLabelView.centerXAnchor.constraint(equalTo: infoLabelShadowView.centerXAnchor).isActive = true
+
+    infoLabelView.addSubview(infoLabel)
+    infoLabel.leadingAnchor.constraint(equalTo: infoLabelView.leadingAnchor).isActive = true
+    infoLabel.trailingAnchor.constraint(equalTo: infoLabelView.trailingAnchor).isActive = true
+    infoLabel.bottomAnchor.constraint(equalTo: infoLabelView.bottomAnchor).isActive = true
+    infoLabel.topAnchor.constraint(equalTo: infoLabelView.topAnchor).isActive = true
   }
   
   func initPlayer() {
@@ -770,8 +831,8 @@ class ViewController: UIViewController {
               }
             }
           } else {
+            sender.isHidden = true
             guessLabel.alpha = 1.0
-            sender.isEnabled = false
             keyboardCollectionView.isUserInteractionEnabled = true
             answerSubmitted = false
             isLiked = false
@@ -798,7 +859,7 @@ class ViewController: UIViewController {
                 self?.definitionCollectionView.scrollToItem(at: IndexPath(item: 0, section: 1), at: .top, animated: false)
                 
                 if self!.keyboardOption != .keyboard { self?.keyboardCollectionView.reloadData() }
-                sender.isEnabled.toggle()
+//                sender.isHidden.toggle()
               }
             }
           }
