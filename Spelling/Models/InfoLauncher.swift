@@ -2,10 +2,11 @@
 //  InfoLauncher.swift
 //  Spelling
 //
-//  Created by Macbook Pro on 2021-07-28.
+//  Created by Gil Jetomo on 2021-07-28.
 //
 
 import UIKit
+import BuyMeACoffee
 
 class InfoLauncher: NSObject {
   
@@ -19,10 +20,17 @@ class InfoLauncher: NSObject {
     v.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
     return v
   }()
+  let bmcButton: BMCButton = {
+    let b = BMCButton(configuration: .default)
+    b.translatesAutoresizingMaskIntoConstraints = false
+    b.configuration = .init(color: .yellow, font: .cookie)
+    return b
+  }()
+  
   lazy var textView: UITextView = {
     let tv = UITextView()
     tv.translatesAutoresizingMaskIntoConstraints = false
-    let text = "SPL works best with US-Tom (Enhanced) and UK-Daniel (Enhanced) voices installed from:\n\nSettings ＞ Accessibility ＞ Spoken Content ＞ Speak Selection (toggled on), then Voices ＞ English."
+    let text = "SPL works best with US-Tom (Enhanced) and UK-Daniel (Enhanced) voices installed from:\n\nSettings ＞ Accessibility ＞ Spoken Content ＞ Speak Selection (toggled on,) then Voices ＞ English."
     let attributedString = NSMutableAttributedString(string: text)
     
     let allTextRange = attributedString.mutableString.range(of: text)
@@ -69,6 +77,7 @@ class InfoLauncher: NSObject {
       blackView.alpha = 0
       
       window.addSubview(view)
+      
       windowHeight = window.frame.height
       guard let windowHeight = windowHeight else { return }
       let height = windowHeight * 0.40
@@ -82,11 +91,16 @@ class InfoLauncher: NSObject {
   }
   override init() {
     super.init()
+    
     view.addSubview(textView)
     textView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     textView.topAnchor.constraint(equalTo: view.topAnchor, constant: 5).isActive = true
     textView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.70).isActive = true
     textView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.90).isActive = true
+    
+    view.addSubview(bmcButton)
+    bmcButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    bmcButton.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 3).isActive = true
   }
   
   @objc func dismissView() {
@@ -95,9 +109,6 @@ class InfoLauncher: NSObject {
       if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
         self.view.frame = CGRect(x: 0, y: window.frame.height, width: self.view.frame.width, height: self.view.frame.height)
       }
-    } completion: { [weak self] (_) in
-//      guard let level = self?.selectedLevel else { return }
-//      self?.delegate?.changeLevel(to: level)
     }
   }
   

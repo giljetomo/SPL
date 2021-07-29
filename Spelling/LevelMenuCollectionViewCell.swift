@@ -2,7 +2,7 @@
 //  LevelMenuCollectionViewCell.swift
 //  Spelling
 //
-//  Created by Macbook Pro on 2021-07-23.
+//  Created by Gil Jetomo on 2021-07-23.
 //
 
 import UIKit

@@ -2,7 +2,7 @@
 //  UIColor+HEX.swift
 //  Spelling
 //
-//  Created by Macbook Pro on 2021-07-26.
+//  Created by Gil Jetomo on 2021-07-26.
 //
 
 import UIKit

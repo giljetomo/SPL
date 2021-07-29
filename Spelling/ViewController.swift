@@ -10,6 +10,7 @@ import Foundation
 import AVFoundation
 import CoreData
 import SafariServices
+import BuyMeACoffee
 
 class ViewController: UIViewController {
   
@@ -347,7 +348,9 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = Color.screenColor
-
+    
+    BMCManager.shared.presentingViewController = self
+    
     //    if let context = container?.viewContext {
     //      ManagedWord.preloadData(in: context)
     //    }
