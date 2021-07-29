@@ -27,9 +27,13 @@ class ViewController: UIViewController {
   var answerSubmitted = false
   var animationsPlaying = false
   
+  var country: Country = .US
   var keyboardOption: KeyboardOption = .keyboard
+  var definition = [String: String]()
+  var partOfSpeech = [String]()
   var shuffledWord = [[String]]()
   var concealedWord = [[String]]()
+  
   var word: Word? {
     didSet {
       guard !didChangeDiction else { return }
@@ -45,9 +49,9 @@ class ViewController: UIViewController {
       concealedWord = Keyboard.getConcealedWord(word: word.text)
     }
   }
-  var country: Country = .US
-  var definition = [String: String]()
-  var partOfSpeech = [String]()
+  
+  var definitionCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+  var keyboardCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   
   let topView: UIView = {
     let v = UIView()
@@ -74,9 +78,6 @@ class ViewController: UIViewController {
     v.translatesAutoresizingMaskIntoConstraints = false
     return v
   }()
-  var definitionCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-  var keyboardCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-  
   lazy var levelTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(launchLevelMenu))
   let levelView: UIView = {
     let v = UIView()
@@ -105,7 +106,6 @@ class ViewController: UIViewController {
   let audioImageView: UIImageView = {
     let iv = UIImageView()
     iv.translatesAutoresizingMaskIntoConstraints = false
-    iv.image = UIImage(named: "audio")
     iv.image?.withRenderingMode(.alwaysTemplate)
     iv.contentMode = .scaleAspectFit
     iv.tintColor = Color.buttonColorText
@@ -186,7 +186,6 @@ class ViewController: UIViewController {
     sc.setTitleTextAttributes([NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: Color.textColor], for: .normal)
     sc.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: Color.screenColor], for: .selected)
     sc.apportionsSegmentWidthsByContent = true
-    sc.selectedSegmentIndex = 0
     sc.isHidden = true
     sc.addTarget(self, action: #selector(keyboardChanged(_:)), for: .valueChanged)
     sc.selectedSegmentTintColor = Color.textColor
@@ -195,7 +194,6 @@ class ViewController: UIViewController {
   }()
   let dictionButton: UIButton = {
     let btn = UIButton()
-    btn.setTitle("US", for: .normal)
     btn.titleLabel?.font = .preferredFont(forTextStyle: .headline)
     btn.titleLabel?.adjustsFontSizeToFitWidth = true
     btn.translatesAutoresizingMaskIntoConstraints = false
@@ -212,7 +210,6 @@ class ViewController: UIViewController {
     btn.contentEdgeInsets = .init(top: 3, left: 6, bottom: 3, right: 6)
     return btn
   }()
-  
   let guessLabelView: UIView = {
     let v = UIView()
     v.translatesAutoresizingMaskIntoConstraints = false
@@ -233,7 +230,7 @@ class ViewController: UIViewController {
     btn.titleLabel?.font = .preferredFont(forTextStyle: .headline)
     btn.translatesAutoresizingMaskIntoConstraints = false
     btn.isHidden = true
-    btn.addTarget(self, action: #selector(fetchNextWord(_:)), for: .touchUpInside)
+    btn.addTarget(self, action: #selector(fetchNextSubmitWord(_:)), for: .touchUpInside)
     btn.setTitleColor(Color.buttonColorText, for: .normal)
     btn.backgroundColor = Color.buttonColorBackground
     btn.layer.cornerRadius = 5
@@ -293,12 +290,6 @@ class ViewController: UIViewController {
     return lbl
   }()
   
-  private func isRandomWordFetchSuccessful() -> Bool {
-    guard let context = container?.viewContext else { return false }
-    fetchedWord = try? ManagedWord.fetchWord(with: level, in: context)
-    return fetchedWord != nil
-  }
-  
   let infoLauncher = InfoLauncher()
   
   @objc func launchInfoView() {
@@ -327,35 +318,54 @@ class ViewController: UIViewController {
       }
     }
   }
-  func setWidthToSegmentedControl(view :UIView)  {
-    let subviews = view.subviews
-    for subview in subviews {
-      if subview is UILabel {
-        let label: UILabel? = (subview as? UILabel)
-        print("label found: \(label?.text)")
-        label?.adjustsFontSizeToFitWidth = true
-        label?.minimumScaleFactor = 0.1
-      }else {
-        setWidthToSegmentedControl(view: subview)
-      }
-    }
+  
+  private func isWordFetchSuccessful() -> Bool {
+    guard let context = container?.viewContext else { return false }
+    
+    fetchedWord = AppSettings.word.isEmpty
+                  ? try? ManagedWord.fetchWord(with: level, in: context)
+                  : try? ManagedWord.findWord(AppSettings.word, in: context)
+    
+    return fetchedWord != nil
   }
   
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-    setWidthToSegmentedControl(view: keyboardSegmentedControl)
+  private func loadUserDefaults() {
+    //language
+    let language = AppSettings.language.replacingOccurrences(of: "en_", with: "")
+    dictionButton.setTitle(language == "GB" ? "UK" : language, for: .normal)
+    country = Country(rawValue: AppSettings.language) ?? .US
+    //level
+    levelLabel.text = AppSettings.level.uppercased()
+    level = Level(rawValue: AppSettings.level) ?? .tourist
+    //volume
+    volumeSlider.value = AppSettings.volume
+    if volumeSlider.value == 0.0 {
+      audioImageView.image = UIImage(named: "muted")
+      audioImageView.isUserInteractionEnabled = false
+      isAudioMuted = true
+    } else {
+      audioImageView.image = UIImage(named: "audio")
+      audioImageView.isUserInteractionEnabled = true
+      isAudioMuted = false
+    }
+    //keyboard
+    keyboardOption = KeyboardOption(rawValue: AppSettings.keyboard) ?? .keyboard
+    keyboardSegmentedControl.selectedSegmentIndex = keyboardOption.rawValue
   }
+  
+  //Use this code to preload CoreData
+  //    if let context = container?.viewContext {
+  //      ManagedWord.preloadData(in: context)
+  //    }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = Color.screenColor
-    
+    loadUserDefaults()
     BMCManager.shared.presentingViewController = self
     
-    //    if let context = container?.viewContext {
-    //      ManagedWord.preloadData(in: context)
-    //    }
-    
-    guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
+    guard isWordFetchSuccessful(), let text = fetchedWord?.text else { return }
+    AppSettings.word = text
     print(text)
     fetchWordAPI(with: country) {(successful) in
       DispatchQueue.main.async { [weak self] in
@@ -369,7 +379,7 @@ class ViewController: UIViewController {
         self?.keyboardCollectionView.delegate = self
         self?.keyboardCollectionView.dataSource = self
         
-        self?.definitionCollectionView.collectionViewLayout = self!.generateLayout()
+        self?.definitionCollectionView.collectionViewLayout = self!.generateDefinitionLayout()
         self?.keyboardCollectionView.collectionViewLayout = self!.generateKeyboardLayout()
         self?.changeUIStateAfterFetch(true)
         UIView.animate(withDuration: 0.50) { [weak self] in
@@ -385,6 +395,7 @@ class ViewController: UIViewController {
     keyboardCollectionView.register(KeyboardCollectionViewCell.self, forCellWithReuseIdentifier: KeyboardCollectionViewCell.reuseIdentifier)
     definitionCollectionView.backgroundColor = Color.screenColor
     keyboardCollectionView.backgroundColor = Color.screenColor
+    
     setupViewLayout()
     
     NotificationCenter.default.addObserver(self, selector: #selector(changeAudioState), name: .playbackEnded, object: nil)
@@ -420,7 +431,7 @@ class ViewController: UIViewController {
     
   }
   
-  private func generateLayout() -> UICollectionViewLayout {
+  private func generateDefinitionLayout() -> UICollectionViewLayout {
     let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
       
       let item = NSCollectionLayoutItem(
@@ -622,6 +633,7 @@ class ViewController: UIViewController {
     
     guard let option = KeyboardOption(rawValue: sender.selectedSegmentIndex) else { return }
     keyboardOption = option
+    AppSettings.keyboard = keyboardOption.rawValue
     UIView.animate(withDuration: 0.5) { [weak self] in
       self?.keyboardCollectionView.reloadData()
     }
@@ -685,6 +697,8 @@ class ViewController: UIViewController {
   }
   
   @objc func adjustVolume(_ sender: UISlider) {
+    AppSettings.volume = sender.value
+    
     sender.alpha = 0.20
     UIView.animate(withDuration: 0.40) { [weak self] in
       sender.transform = .identity
@@ -729,6 +743,7 @@ class ViewController: UIViewController {
     definitionCollectionView.isUserInteractionEnabled.toggle()
     dictionButton.isUserInteractionEnabled.toggle()
     levelLabel.isUserInteractionEnabled.toggle()
+    infoLabelShadowView.isUserInteractionEnabled.toggle()
     
     if animationsPlaying { setPlayImageViewColor()
       return
@@ -785,7 +800,7 @@ class ViewController: UIViewController {
     CATransaction.commit()
   }
   
-  @objc func fetchNextWord(_ sender: UIButton) {
+  @objc func fetchNextSubmitWord(_ sender: UIButton) {
     UIView.animate(withDuration: 0.10) {
       sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
     } completion: { (_) in
@@ -794,6 +809,7 @@ class ViewController: UIViewController {
       } completion: { (_) in
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [unowned self] in
           if sender.title(for: .normal) == "Submit" {
+            AppSettings.word.removeAll()
             answerSubmitted = true
             nextAndSubmitButton.alpha = 0
             isFirstLoadWordSection = true
@@ -846,8 +862,9 @@ class ViewController: UIViewController {
             WordCollectionViewCell.allAnimationsLoaded = nil
             DefinitionCollectionViewCell.isFirstLoadDone = nil
             
-            guard isRandomWordFetchSuccessful(), let text = fetchedWord?.text else { return }
-            print(text)
+            guard isWordFetchSuccessful(), let text = fetchedWord?.text else { return }
+            AppSettings.word = text
+            print(AppSettings.word)
             
             fetchWordAPI(with: country) { (successful) in
               DispatchQueue.main.async { [weak self] in
@@ -930,6 +947,8 @@ class ViewController: UIViewController {
     let title = sender.title(for: .normal) == "US" ? "UK" : "US"
     
     country.toggle()
+    AppSettings.language = country.rawValue
+    
     didChangeDiction = true
     sender.layer.shadowOpacity = 0
     
@@ -1143,7 +1162,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 // MARK: - KeyboardCollectionViewCellDelegate
 extension ViewController: KeyboardCollectionViewCellDelegate {
   func keyPressed(for key: String) {
-    guard let text = word?.text else { return }
+    guard let _ = word?.text else { return }
     let word: String = {
       guard let text = guessLabel.text else { return "" }
       if key.count == 1 { return text + key }
@@ -1180,6 +1199,7 @@ extension ViewController: LevelMenuLauncherDelegate {
   func changeLevel(to level: Level) {
     guard self.level != level else { return }
     self.level = level
+    AppSettings.level = level.rawValue
     
     UIView.transition(with: levelView, duration: 0.5, options: .transitionFlipFromTop) {
       self.levelLabel.text = self.level.rawValue.uppercased()
