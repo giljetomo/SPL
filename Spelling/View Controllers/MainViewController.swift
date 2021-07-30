@@ -11,8 +11,12 @@ import AVFoundation
 import CoreData
 import SafariServices
 import BuyMeACoffee
+import Network
 
 class MainViewController: UIViewController {
+  
+  let networkMonitor = NWPathMonitor()
+  var isInternetAvailable = false
   
   var container: NSPersistentContainer? = AppDelegate.persistentContainer
   var fetchedWord: ManagedWord?
@@ -363,7 +367,8 @@ class MainViewController: UIViewController {
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    guard AppSettings.isFirstLoad else { return }
+    
+    guard isInternetAvailable, AppSettings.isFirstLoad else { return }
     createSpinnerView()
     AppSettings.isFirstLoad = false
   }
@@ -372,12 +377,21 @@ class MainViewController: UIViewController {
   //    if let context = container?.viewContext {
   //      ManagedWord.preloadData(in: context)
   //    }
+  fileprivate func monitorInternetStatus() {
+    let queue = DispatchQueue(label: "Monitor")
+    
+    networkMonitor.pathUpdateHandler = { [unowned self] path in
+      isInternetAvailable = path.status == .satisfied
+    }
+    networkMonitor.start(queue: queue)
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = Color.screenColor
+    monitorInternetStatus()
     loadUserDefaults()
-    BMCManager.shared.presentingViewController = self
-    
+  
     guard isWordFetchSuccessful(), let text = fetchedWord?.text else { return }
     AppSettings.word = text
     print(text)
@@ -416,6 +430,7 @@ class MainViewController: UIViewController {
     setupViewLayout()
     
     NotificationCenter.default.addObserver(self, selector: #selector(updateUIState), name: .playbackEnded, object: nil)
+    BMCManager.shared.presentingViewController = self
   }
   
   override func viewDidLayoutSubviews() {

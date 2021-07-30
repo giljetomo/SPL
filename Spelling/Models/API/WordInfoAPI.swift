@@ -11,6 +11,7 @@ class WordInfoAPI {
   
   static let shared = WordInfoAPI()
   private var dataTask: URLSessionDataTask?
+  let sessionConfig = URLSessionConfiguration.default
   
   enum NetworkError: Error {
     case client(message: String)
@@ -21,7 +22,11 @@ class WordInfoAPI {
   func fetchWordInfoAPI(word: String, country: Country, completion: @escaping (Result<[WordAPI], NetworkError>) -> Void) {
     guard let url = URL(string: Endpoint.baseURL + country.rawValue + "/" + word) else { return }
     
-    let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+    sessionConfig.timeoutIntervalForRequest = 7.0
+    sessionConfig.timeoutIntervalForResource = 7.0
+    let session = URLSession(configuration: sessionConfig)
+    
+    let task = session.dataTask(with: url) {(data, response, error) in
       guard error == nil else {
         completion(.failure(.client(message: "invalid request")))
         return
