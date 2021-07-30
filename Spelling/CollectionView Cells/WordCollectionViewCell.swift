@@ -68,13 +68,9 @@ class WordCollectionViewCell: UICollectionViewCell {
     heartImageView.addGestureRecognizer(heartTapRecognizer)
     wordLabel.addGestureRecognizer(wordTapRecognizer)
     
-    contentView.addSubview(view)
-    //  constraints need to be applied so the button does not overflow outside the contentView
-    view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-    view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-    view.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
     contentView.layer.cornerRadius = 5
+    contentView.addSubview(view)
+    view.matchParent()
     
     view.addSubview(heartImageView)
     heartImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true

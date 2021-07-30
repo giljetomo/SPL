@@ -7,8 +7,6 @@
 
 import UIKit
 
-
-
 class DefinitionCollectionViewCell: UICollectionViewCell {
   static var isFirstLoadDone: Bool?
   static let reuseIdentifier = "DefinitionCollectionViewCell"
@@ -29,12 +27,9 @@ class DefinitionCollectionViewCell: UICollectionViewCell {
   
   override init(frame: CGRect) {
     super.init(frame: frame)
+    
     contentView.addSubview(definitionLabel)
-//  constraints need to be applied so the button does not overflow outside the contentView
-    definitionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-    definitionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-    definitionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-    definitionLabel.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+    definitionLabel.matchParent()
     contentView.layer.cornerRadius = 5
   }
   required init?(coder: NSCoder) {

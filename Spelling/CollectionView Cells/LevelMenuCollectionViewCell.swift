@@ -42,8 +42,8 @@ class LevelMenuCollectionViewCell: UICollectionViewCell {
     super.init(frame: frame)
     contentView.addSubview(hStackView)
     
-    hStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-    hStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+    hStackView.centerXYin(contentView)
+    
     contentView.backgroundColor = Color.screenColor
     contentView.layer.cornerRadius = 8
     contentView.layer.masksToBounds = false

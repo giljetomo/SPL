@@ -13,4 +13,6 @@ enum StorageKey: String {
   case level
   case volume
   case keyboard
+  case isFirstLoad
+  case isFirstInstall
 }

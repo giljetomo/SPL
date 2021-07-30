@@ -822,7 +822,9 @@ class MainViewController: UIViewController {
             keyboardView.isUserInteractionEnabled = false
             animationsPlaying = true
             updateUIState()
-            UIView.transition(with: sender, duration: 0.5, options: .transitionCrossDissolve) { sender.alpha = 0 }
+            UIView.transition(with: sender, duration: 0.5, options: .transitionCrossDissolve) {
+              sender.alpha = 0
+            }
 
             showCorrectWord { (completed) in
               if completed {
@@ -862,7 +864,7 @@ class MainViewController: UIViewController {
             UIView.transition(with: sender, duration: 0.5, options: .transitionCrossDissolve) {
               sender.alpha = 0
             } completion: { (_) in
-              sender.isEnabled = true
+              sender.isEnabled.toggle()
             }
             guessLabel.alpha = 1.0
             keyboardCollectionView.isUserInteractionEnabled = true

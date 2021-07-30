@@ -22,5 +22,11 @@ struct AppSettings {
   
   @Storage(key: .keyboard, defaultValue: KeyboardOption.keyboard.rawValue)
   static var keyboard: Int
+  
+  @Storage(key: .isFirstLoad, defaultValue: false)
+  static var isFirstLoad: Bool
+  
+  @Storage(key: .isFirstInstall, defaultValue: true)
+  static var isFirstInstall: Bool
 }
 

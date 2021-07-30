@@ -15,6 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
     BMCManager.shared.configure(username: "giomo")
+    AppSettings.isFirstLoad = true
     return true
   }
   
@@ -34,19 +35,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   
   // MARK: - Core Data stack
   
-  private func isFirstLaunch() -> Bool {
-    let isFirstLaunchKey = "firstLaunch"
-    let userDefaults = UserDefaults.standard
-    let isFirstLaunch = !userDefaults.bool(forKey: isFirstLaunchKey)
-    
-    if isFirstLaunch { userDefaults.setValue(true, forKey: isFirstLaunchKey) }
-    return isFirstLaunch
+  private func isFirstInstall() -> Bool {
+    let isFirstInstall = AppSettings.isFirstInstall
+    if isFirstInstall { AppSettings.isFirstInstall = false }
+    return isFirstInstall
   }
 
   lazy var persistentContainer: NSPersistentContainer = {
     let container = NSPersistentContainer(name: "Spelling")
     
-    if isFirstLaunch() {
+    if isFirstInstall() {
       if let storeUrl = container.persistentStoreDescriptions.first?.url,
          let seededDataUrl = Bundle.main.url(forResource: "Spelling", withExtension: "sqlite") {
         do {

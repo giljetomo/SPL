@@ -20,7 +20,7 @@ struct Word {
   }
   
   static func maskWord(_ str: String, from text: String) -> String {
-    let count = Int(ceil(Double(str.count) * 0.70))
+    let count = Int(ceil(Double(str.count) * 0.50))
     let newText = str.prefix(count)
     let asterisks = String(repeating: "*", count: count)
 

@@ -14,7 +14,7 @@
 		524CFE23269915CE00510D2F /* Favorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524CFE22269915CD00510D2F /* Favorite.swift */; };
 		52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA0182678316400E1F86A /* AppDelegate.swift */; };
 		52ACA01B2678316400E1F86A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA01A2678316400E1F86A /* SceneDelegate.swift */; };
-		52ACA01D2678316400E1F86A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA01C2678316400E1F86A /* ViewController.swift */; };
+		52ACA01D2678316400E1F86A /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA01C2678316400E1F86A /* MainViewController.swift */; };
 		52ACA0232678316400E1F86A /* Spelling.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 52ACA0212678316400E1F86A /* Spelling.xcdatamodeld */; };
 		52ACA0252678316A00E1F86A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52ACA0242678316A00E1F86A /* Assets.xcassets */; };
 		52ACA0282678316A00E1F86A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 52ACA0262678316A00E1F86A /* LaunchScreen.storyboard */; };
@@ -32,6 +32,8 @@
 		52CFEF6626B324FD001247C6 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF6526B324FD001247C6 /* Storage.swift */; };
 		52CFEF6826B32522001247C6 /* StorageKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF6726B32522001247C6 /* StorageKey.swift */; };
 		52CFEF6A26B3262C001247C6 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF6926B3262C001247C6 /* AppSettings.swift */; };
+		52CFEF7026B34323001247C6 /* UIView+ConstraintLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF6F26B34323001247C6 /* UIView+ConstraintLayout.swift */; };
+		52CFEF7226B34FEB001247C6 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF7126B34FEB001247C6 /* SpinnerViewController.swift */; };
 		52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D50269E78A9000F6006 /* SpeechService.swift */; };
 		52D55D5826A12F99000F6006 /* ManagedWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5726A12F99000F6006 /* ManagedWord.swift */; };
 		52D55D5D26A1301D000F6006 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5C26A1301D000F6006 /* Status.swift */; };
@@ -74,7 +76,7 @@
 		52ACA0152678316400E1F86A /* Spelling.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spelling.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52ACA0182678316400E1F86A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52ACA01A2678316400E1F86A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		52ACA01C2678316400E1F86A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		52ACA01C2678316400E1F86A /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		52ACA0222678316400E1F86A /* Spelling.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Spelling.xcdatamodel; sourceTree = "<group>"; };
 		52ACA0242678316A00E1F86A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		52ACA0272678316A00E1F86A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -93,6 +95,8 @@
 		52CFEF6526B324FD001247C6 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		52CFEF6726B32522001247C6 /* StorageKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageKey.swift; sourceTree = "<group>"; };
 		52CFEF6926B3262C001247C6 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		52CFEF6F26B34323001247C6 /* UIView+ConstraintLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+ConstraintLayout.swift"; sourceTree = "<group>"; };
+		52CFEF7126B34FEB001247C6 /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		52D55D50269E78A9000F6006 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		52D55D5726A12F99000F6006 /* ManagedWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedWord.swift; sourceTree = "<group>"; };
 		52D55D5C26A1301D000F6006 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
@@ -153,19 +157,14 @@
 		52ACA0172678316400E1F86A /* Spelling */ = {
 			isa = PBXGroup;
 			children = (
+				52D55D5A26A12F9F000F6006 /* CoreData */,
 				52D55D7226A3D0C0000F6006 /* SQLite */,
 				52ACA0402678387E00E1F86A /* Models */,
 				52ACA05D267BE15C00E1F86A /* Supporting Files */,
-				52ACA01C2678316400E1F86A /* ViewController.swift */,
-				5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */,
-				52D55DAF26AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift */,
-				52D55D9526A638EF000F6006 /* ProfileTableViewController.swift */,
-				52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */,
-				524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */,
-				52D55D9826A67BB7000F6006 /* WordTableViewCell.swift */,
+				52CFEF7526B3843B001247C6 /* View Controllers */,
+				52CFEF7626B3844C001247C6 /* CollectionView Cells */,
 				52ACA068267D213D00E1F86A /* Utils */,
 				52ACA0292678316A00E1F86A /* Info.plist */,
-				52D55D5A26A12F9F000F6006 /* CoreData */,
 			);
 			path = Spelling;
 			sourceTree = "<group>";
@@ -202,6 +201,7 @@
 		52ACA068267D213D00E1F86A /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				52CFEF6F26B34323001247C6 /* UIView+ConstraintLayout.swift */,
 				52D55D9B26A67E78000F6006 /* FetchedResultsTableViewController.swift */,
 				52D55DA126A75490000F6006 /* HeartButton.swift */,
 				52D55DC026AFCC55000F6006 /* UIColor+HEX.swift */,
@@ -249,6 +249,28 @@
 				52CFEF6726B32522001247C6 /* StorageKey.swift */,
 			);
 			path = "User Defaults";
+			sourceTree = "<group>";
+		};
+		52CFEF7526B3843B001247C6 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				52ACA01C2678316400E1F86A /* MainViewController.swift */,
+				52CFEF7126B34FEB001247C6 /* SpinnerViewController.swift */,
+				52D55D9526A638EF000F6006 /* ProfileTableViewController.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		52CFEF7626B3844C001247C6 /* CollectionView Cells */ = {
+			isa = PBXGroup;
+			children = (
+				5244D0D726866D3000BFAF6B /* KeyboardCollectionViewCell.swift */,
+				52D55DAF26AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift */,
+				52ACA05F267BE1BA00E1F86A /* DefinitionCollectionViewCell.swift */,
+				524CFE1E2696994A00510D2F /* WordCollectionViewCell.swift */,
+				52D55D9826A67BB7000F6006 /* WordTableViewCell.swift */,
+			);
+			path = "CollectionView Cells";
 			sourceTree = "<group>";
 		};
 		52D55D5A26A12F9F000F6006 /* CoreData */ = {
@@ -405,7 +427,7 @@
 				52ACA03B267837BE00E1F86A /* Endpoint.swift in Sources */,
 				52ACA04F267961C700E1F86A /* Notification+Names.swift in Sources */,
 				52D55D9926A67BB9000F6006 /* WordTableViewCell.swift in Sources */,
-				52ACA01D2678316400E1F86A /* ViewController.swift in Sources */,
+				52ACA01D2678316400E1F86A /* MainViewController.swift in Sources */,
 				52ACA04326783CFC00E1F86A /* Word.swift in Sources */,
 				52D55D9626A638EF000F6006 /* ProfileTableViewController.swift in Sources */,
 				52D55D9C26A67E78000F6006 /* FetchedResultsTableViewController.swift in Sources */,
@@ -414,8 +436,10 @@
 				52D55DC726B20E9B000F6006 /* InfoLauncher.swift in Sources */,
 				524CFE1F2696994A00510D2F /* WordCollectionViewCell.swift in Sources */,
 				52D55DAD26AB70F8000F6006 /* LevelMenuLauncher.swift in Sources */,
+				52CFEF7026B34323001247C6 /* UIView+ConstraintLayout.swift in Sources */,
 				52ACA0192678316400E1F86A /* AppDelegate.swift in Sources */,
 				52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */,
+				52CFEF7226B34FEB001247C6 /* SpinnerViewController.swift in Sources */,
 				52ACA0382678367300E1F86A /* WordInfoAPI.swift in Sources */,
 				52ACA058267BBA6000E1F86A /* Level.swift in Sources */,
 				52D55DB026AB7EDD000F6006 /* LevelMenuCollectionViewCell.swift in Sources */,
