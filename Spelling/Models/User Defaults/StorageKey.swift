@@ -15,4 +15,5 @@ enum StorageKey: String {
   case keyboard
   case isFirstLoad
   case isFirstInstall
+  case launchScreenWord
 }

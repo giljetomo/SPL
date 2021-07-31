@@ -34,6 +34,7 @@
 		52CFEF6A26B3262C001247C6 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF6926B3262C001247C6 /* AppSettings.swift */; };
 		52CFEF7026B34323001247C6 /* UIView+ConstraintLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF6F26B34323001247C6 /* UIView+ConstraintLayout.swift */; };
 		52CFEF7226B34FEB001247C6 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF7126B34FEB001247C6 /* SpinnerViewController.swift */; };
+		52CFEF7C26B48C84001247C6 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CFEF7B26B48C83001247C6 /* LaunchScreenViewController.swift */; };
 		52D55D51269E78AA000F6006 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D50269E78A9000F6006 /* SpeechService.swift */; };
 		52D55D5826A12F99000F6006 /* ManagedWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5726A12F99000F6006 /* ManagedWord.swift */; };
 		52D55D5D26A1301D000F6006 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D55D5C26A1301D000F6006 /* Status.swift */; };
@@ -97,6 +98,7 @@
 		52CFEF6926B3262C001247C6 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		52CFEF6F26B34323001247C6 /* UIView+ConstraintLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+ConstraintLayout.swift"; sourceTree = "<group>"; };
 		52CFEF7126B34FEB001247C6 /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
+		52CFEF7B26B48C83001247C6 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
 		52D55D50269E78A9000F6006 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		52D55D5726A12F99000F6006 /* ManagedWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedWord.swift; sourceTree = "<group>"; };
 		52D55D5C26A1301D000F6006 /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 			children = (
 				52ACA01C2678316400E1F86A /* MainViewController.swift */,
 				52CFEF7126B34FEB001247C6 /* SpinnerViewController.swift */,
+				52CFEF7B26B48C83001247C6 /* LaunchScreenViewController.swift */,
 				52D55D9526A638EF000F6006 /* ProfileTableViewController.swift */,
 			);
 			path = "View Controllers";
@@ -421,6 +424,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52CFEF7C26B48C84001247C6 /* LaunchScreenViewController.swift in Sources */,
 				52ACA05B267BBEB900E1F86A /* UIPaddedLabel.swift in Sources */,
 				52CFEF6826B32522001247C6 /* StorageKey.swift in Sources */,
 				52D55D5826A12F99000F6006 /* ManagedWord.swift in Sources */,

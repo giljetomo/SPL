@@ -54,6 +54,22 @@ class ManagedWord: NSManagedObject {
     }
   }
   
+  class func getPWord(with level: Level, in context: NSManagedObjectContext) throws -> ManagedWord? {
+    let lowerbound = level.range.lowerBound
+    let upperbound = level.range.upperBound
+    let request: NSFetchRequest<ManagedWord> = ManagedWord.fetchRequest()
+    let predicate = NSPredicate(format: "text BEGINSWITH %@", "p")
+    let textLengthPredicate = NSPredicate(format: "text MATCHES %@", ".{\(lowerbound),\(upperbound)}")
+    request.predicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, textLengthPredicate])
+    do {
+      let words = try context.fetch(request)
+      return getRandomWord(words)
+    } catch {
+      print(error.localizedDescription)
+    }
+    return nil
+  }
+  
   class func preloadData(in context: NSManagedObjectContext) {
     //    let contents = try! String(contentsOfFile: "/Users/macbookpro/Downloads/English/outmod.txt", encoding: .utf8)
     //    let lines = contents.split(separator: "\n")

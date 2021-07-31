@@ -28,5 +28,8 @@ struct AppSettings {
   
   @Storage(key: .isFirstInstall, defaultValue: true)
   static var isFirstInstall: Bool
+  
+  @Storage(key: .launchScreenWord, defaultValue: "pronounce")
+  static var launchScreenWord: String
 }
 

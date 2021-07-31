@@ -1037,7 +1037,7 @@ class MainViewController: UIViewController {
               completion(false)
               return
             }
-            if let audio = item.phonetics.first?.audio {
+            if let _ = item.phonetics.first?.audio {
               self?.word = Word(text: fetchedWord, definition: self!.definition, audio: nil)
               //if audio is available from API
               //self?.initPlayer()
