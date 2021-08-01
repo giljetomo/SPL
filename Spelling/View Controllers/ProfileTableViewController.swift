@@ -107,7 +107,7 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
       guard let countsLabel = countLabel.text, countsLabel != value  else { return }
       
       UIView.transition(with: countLabel, duration: 0.5, options: .transitionFlipFromTop) { [weak self] in
-        self?.countLabel.text = value
+        self?.countLabel.text = count > 0 ? value : " "
         UIView.animate(withDuration: 0.5) {
           self?.countLabel.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
         } completion: { (_) in

@@ -31,5 +31,17 @@ struct AppSettings {
   
   @Storage(key: .launchScreenWord, defaultValue: "pronounce")
   static var launchScreenWord: String
+  
+  @Storage(key: .touristSpellCount, defaultValue: 0)
+  static var touristSpellCount: Int
+  
+  @Storage(key: .immigrantSpellCount, defaultValue: 0)
+  static var immigrantSpellCount: Int
+  
+  @Storage(key: .citizenSpellCount, defaultValue: 0)
+  static var citizenSpellCount: Int
+  
+  @Storage(key: .presidentSpellCount, defaultValue: 0)
+  static var presidentSpellCount: Int
 }
 

@@ -327,8 +327,8 @@ class MainViewController: UIViewController {
     guard let context = container?.viewContext else { return false }
     
     fetchedWord = AppSettings.word.isEmpty
-                  ? try? ManagedWord.fetchWord(with: level, in: context)
-                  : try? ManagedWord.findWord(AppSettings.word, in: context)
+      ? try? ManagedWord.fetchWord(in: context)
+      : try? ManagedWord.findWord(AppSettings.word, in: context)
     
     return fetchedWord != nil
   }
@@ -355,6 +355,24 @@ class MainViewController: UIViewController {
     //keyboard
     keyboardOption = KeyboardOption(rawValue: AppSettings.keyboard) ?? .keyboard
     keyboardSegmentedControl.selectedSegmentIndex = keyboardOption.rawValue
+    //spelling counts
+    guard AppSettings.isFirstLoad, let context = container?.viewContext else { return }
+    context.perform {
+      Level.allCases.forEach {
+        do {
+          let count = try ManagedWord.getCount(for: $0, in: context)
+          switch $0 {
+          case .tourist: AppSettings.touristSpellCount = count
+          case .immigrant: AppSettings.immigrantSpellCount = count
+          case .citizen: AppSettings.citizenSpellCount = count
+          case .president: AppSettings.presidentSpellCount = count
+          }
+        } catch {
+          print(error)
+        }
+      }
+      
+    }
   }
   
   let spinnerVC = SpinnerViewController()
@@ -391,7 +409,7 @@ class MainViewController: UIViewController {
     view.backgroundColor = Color.screenColor
     monitorInternetStatus()
     loadUserDefaults()
-  
+    
     guard isWordFetchSuccessful(), let text = fetchedWord?.text else { return }
     AppSettings.word = text
     print(text)
@@ -556,7 +574,7 @@ class MainViewController: UIViewController {
     
     levelView.addSubview(levelLabel)
     levelLabel.matchParent()
-
+    
     topView.addSubview(levelView)
     levelView.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -8).isActive = true
     levelView.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
@@ -575,7 +593,7 @@ class MainViewController: UIViewController {
     definitionView.addSubview(definitionCollectionView)
     definitionCollectionView.translatesAutoresizingMaskIntoConstraints = false
     definitionCollectionView.matchSize()
-
+    
     audioImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.07).isActive = true
     audioImageView.widthAnchor.constraint(equalTo: audioImageView.heightAnchor, multiplier: 1).isActive = true
     audioVStackView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: audioVStackViewTopAnchor).isActive = true
@@ -634,7 +652,7 @@ class MainViewController: UIViewController {
     
     infoLabelShadowView.trailingAnchor.constraint(equalTo: levelView.trailingAnchor).isActive = true
     infoLabelShadowView.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
-
+    
     
     infoLabelShadowView.addSubview(infoLabelView)
     infoLabelView.centerXYin(infoLabelShadowView)
@@ -840,7 +858,7 @@ class MainViewController: UIViewController {
             UIView.transition(with: sender, duration: 0.5, options: .transitionCrossDissolve) {
               sender.alpha = 0
             }
-
+            
             showCorrectWord { (completed) in
               if completed {
                 DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
@@ -848,6 +866,19 @@ class MainViewController: UIViewController {
                     if completed {
                       self?.checkAnswer { (completed) in
                         if completed {
+                          container?.performBackgroundTask({ (context) in
+                            do {
+                              let count = try ManagedWord.getCount(for: level, in: context)
+                              switch level {
+                              case .tourist: AppSettings.touristSpellCount = count
+                              case .immigrant: AppSettings.immigrantSpellCount = count
+                              case .citizen: AppSettings.citizenSpellCount = count
+                              case .president: AppSettings.presidentSpellCount = count
+                              }
+                            } catch {
+                              print(error)
+                            }
+                          })
                           self?.isFirstLoadDefinitionSection = false
                           DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(900)) { [weak self] in
                             self?.reloadDefinition { (completed) in
@@ -921,21 +952,21 @@ class MainViewController: UIViewController {
       }
     }
   }
-
+  
   private func checkAnswer(completion: @escaping (_ completed: Bool) -> Void) {
     CATransaction.begin()
     CATransaction.setCompletionBlock { completion(true) }
     
     guard let text = fetchedWord?.text, let context = container?.viewContext else { return }
     let isCorrect = text == guessLabel.text
-   
+    
     //frc deletes the entry from the tableview if the state update is performed in the background thread.
     context.perform {
       let word = try? ManagedWord.findWord(text, in: context)
       word?.state = isCorrect ? .spelled : .misspelled
       try? context.save()
     }
-
+    
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [unowned self] in
       if isCorrect {
         UIView.transition(with: guessLabel, duration: 0.8, options: .transitionFlipFromTop) { [weak self] in
@@ -1026,7 +1057,7 @@ class MainViewController: UIViewController {
           if let item = word.first {
             for meaning in item.meanings {
               if let definitionAPI = meaning.definitions.first?.definition {
-                let definition = Word.maskWord(item.word, from: definitionAPI)
+                let definition = Word.maskWord(text, from: definitionAPI)
                 self?.definition.updateValue(definition, forKey: meaning.partOfSpeech + ":")
               }
             }

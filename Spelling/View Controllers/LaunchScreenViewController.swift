@@ -45,8 +45,7 @@ class LaunchScreenViewController: UIViewController {
     
     if let context = container?.viewContext,
        let label = vStackView.arrangedSubviews[1] as? UILabel,
-       let level = Level(rawValue: AppSettings.level),
-       let word = try? ManagedWord.getPWord(with: level, in: context)?.text {
+       let word = try? ManagedWord.getPWord(in: context)?.text {
       
       UIView.transition(with: label, duration: 0.8, options: .transitionFlipFromTop) {
         label.text = word

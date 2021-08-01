@@ -16,4 +16,8 @@ enum StorageKey: String {
   case isFirstLoad
   case isFirstInstall
   case launchScreenWord
+  case touristSpellCount
+  case immigrantSpellCount
+  case citizenSpellCount
+  case presidentSpellCount
 }
