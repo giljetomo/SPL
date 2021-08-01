@@ -88,7 +88,10 @@ class LaunchScreenViewController: UIViewController {
   }
   
   private func splashTimeOut() {
-    SceneDelegate.shared?.window?.rootViewController = MainViewController()
+    guard let window = SceneDelegate.shared?.window else { return }
+  
+    window.rootViewController = MainViewController()
+    UIView.transition(with: window, duration: 0.6, options: .transitionCrossDissolve, animations: nil, completion: nil)
   }
   
 }
