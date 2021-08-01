@@ -30,7 +30,7 @@ class InfoLauncher: NSObject {
   lazy var textView: UITextView = {
     let tv = UITextView()
     tv.translatesAutoresizingMaskIntoConstraints = false
-    let text = "SPL works best with US-Tom (Enhanced) and UK-Daniel (Enhanced) voices installed from:\n\nSettings ＞ Accessibility ＞ Spoken Content ＞ Voices ＞ English."
+    let text = "SPL works best with US-Tom (Enhanced) and UK-Daniel (Enhanced) voices installed from:\n\nSettings ＞ Accessibility ＞ Spoken Content ＞ Voices ＞ English"
     let attributedString = NSMutableAttributedString(string: text)
     
     let allTextRange = attributedString.mutableString.range(of: text)
@@ -42,7 +42,7 @@ class InfoLauncher: NSObject {
     
     attributedString.addAttribute(.font, value: UIFont.preferredFont(forTextStyle: .body), range: allTextRange)
     attributedString.addAttribute(.foregroundColor, value: Color.textColor, range: allTextRange)
-    attributedString.addAttributes([.font: UIFont.boldSystemFont(ofSize: 21)], range: splRange)
+    attributedString.addAttributes([.font: UIFont.boldSystemFont(ofSize: 22)], range: splRange)
     attributedString.addAttributes([.font: UIFont.boldSystemFont(ofSize: 17)], range: tomRange)
     attributedString.addAttributes([.font: UIFont.boldSystemFont(ofSize: 17)], range: danielRange)
     
