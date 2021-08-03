@@ -1,4 +1,4 @@
-<h4 style="text-align: center;">Privacy Policy</p>
+<h4 style="text-align: center;">Privacy Policy</h4>
 
 
 You can use the [editor on GitHub](https://github.com/giljetomo/SPL/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
