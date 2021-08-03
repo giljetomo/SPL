@@ -11,8 +11,12 @@ import AVFoundation
 import CoreData
 import SafariServices
 import BuyMeACoffee
+import Network
 
 class MainViewController: UIViewController {
+  
+  let networkMonitor = NWPathMonitor()
+  var isInternetAvailable = false
   
   var container: NSPersistentContainer? = AppDelegate.persistentContainer
   var fetchedWord: ManagedWord?
@@ -323,7 +327,7 @@ class MainViewController: UIViewController {
     guard let context = container?.viewContext else { return false }
     
     fetchedWord = AppSettings.word.isEmpty
-                  ? try? ManagedWord.fetchWord(with: level, in: context)
+                  ? try? ManagedWord.fetchWord(in: context)
                   : try? ManagedWord.findWord(AppSettings.word, in: context)
     
     return fetchedWord != nil
@@ -351,6 +355,24 @@ class MainViewController: UIViewController {
     //keyboard
     keyboardOption = KeyboardOption(rawValue: AppSettings.keyboard) ?? .keyboard
     keyboardSegmentedControl.selectedSegmentIndex = keyboardOption.rawValue
+    //spelling counts
+    guard AppSettings.isFirstLoad, let context = container?.viewContext else { return }
+    context.perform {
+      Level.allCases.forEach {
+        do {
+          let count = try ManagedWord.getCount(for: $0, in: context)
+          switch $0 {
+          case .tourist: AppSettings.touristSpellCount = count
+          case .immigrant: AppSettings.immigrantSpellCount = count
+          case .citizen: AppSettings.citizenSpellCount = count
+          case .president: AppSettings.presidentSpellCount = count
+          }
+        } catch {
+          print(error)
+        }
+      }
+      
+    }
   }
   
   let spinnerVC = SpinnerViewController()
@@ -363,7 +385,8 @@ class MainViewController: UIViewController {
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    guard AppSettings.isFirstLoad else { return }
+    
+    guard isInternetAvailable, AppSettings.isFirstLoad else { return }
     createSpinnerView()
     AppSettings.isFirstLoad = false
   }
@@ -372,11 +395,20 @@ class MainViewController: UIViewController {
   //    if let context = container?.viewContext {
   //      ManagedWord.preloadData(in: context)
   //    }
+  fileprivate func monitorInternetStatus() {
+    let queue = DispatchQueue(label: "Monitor")
+    
+    networkMonitor.pathUpdateHandler = { [unowned self] path in
+      isInternetAvailable = path.status == .satisfied
+    }
+    networkMonitor.start(queue: queue)
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = Color.screenColor
+    monitorInternetStatus()
     loadUserDefaults()
-    BMCManager.shared.presentingViewController = self
     
     guard isWordFetchSuccessful(), let text = fetchedWord?.text else { return }
     AppSettings.word = text
@@ -416,6 +448,7 @@ class MainViewController: UIViewController {
     setupViewLayout()
     
     NotificationCenter.default.addObserver(self, selector: #selector(updateUIState), name: .playbackEnded, object: nil)
+    BMCManager.shared.presentingViewController = self
   }
   
   override func viewDidLayoutSubviews() {
@@ -822,8 +855,10 @@ class MainViewController: UIViewController {
             keyboardView.isUserInteractionEnabled = false
             animationsPlaying = true
             updateUIState()
-            UIView.transition(with: sender, duration: 0.5, options: .transitionCrossDissolve) { sender.alpha = 0 }
-
+            UIView.transition(with: sender, duration: 0.5, options: .transitionCrossDissolve) {
+              sender.alpha = 0
+            }
+            
             showCorrectWord { (completed) in
               if completed {
                 DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
@@ -831,6 +866,19 @@ class MainViewController: UIViewController {
                     if completed {
                       self?.checkAnswer { (completed) in
                         if completed {
+                          container?.performBackgroundTask({ (context) in
+                            do {
+                              let count = try ManagedWord.getCount(for: level, in: context)
+                              switch level {
+                              case .tourist: AppSettings.touristSpellCount = count
+                              case .immigrant: AppSettings.immigrantSpellCount = count
+                              case .citizen: AppSettings.citizenSpellCount = count
+                              case .president: AppSettings.presidentSpellCount = count
+                              }
+                            } catch {
+                              print(error)
+                            }
+                          })
                           self?.isFirstLoadDefinitionSection = false
                           DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(900)) { [weak self] in
                             self?.reloadDefinition { (completed) in
@@ -862,7 +910,7 @@ class MainViewController: UIViewController {
             UIView.transition(with: sender, duration: 0.5, options: .transitionCrossDissolve) {
               sender.alpha = 0
             } completion: { (_) in
-              sender.isEnabled = true
+              sender.isEnabled.toggle()
             }
             guessLabel.alpha = 1.0
             keyboardCollectionView.isUserInteractionEnabled = true
@@ -1009,7 +1057,7 @@ class MainViewController: UIViewController {
           if let item = word.first {
             for meaning in item.meanings {
               if let definitionAPI = meaning.definitions.first?.definition {
-                let definition = Word.maskWord(item.word, from: definitionAPI)
+                let definition = Word.maskWord(text, from: definitionAPI)
                 self?.definition.updateValue(definition, forKey: meaning.partOfSpeech + ":")
               }
             }
@@ -1020,7 +1068,7 @@ class MainViewController: UIViewController {
               completion(false)
               return
             }
-            if let audio = item.phonetics.first?.audio {
+            if let _ = item.phonetics.first?.audio {
               self?.word = Word(text: fetchedWord, definition: self!.definition, audio: nil)
               //if audio is available from API
               //self?.initPlayer()

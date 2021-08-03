@@ -15,6 +15,7 @@ enum HexColor: String {
   case darkButtonBackground = "#c9cecb"
   case darkButtonText = "#2e2b29"
   case lightTableviewScreen = "#fffcf5"
+  case launchScreen = "#aebdd7"
 }
 
 struct Color {

@@ -45,20 +45,20 @@
 		315B7E44650E90F2134D22456223AB79 /* BuyMeACoffee.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = BuyMeACoffee.modulemap; sourceTree = "<group>"; };
 		5469D419918C4EB16473826024086143 /* Pods-Spelling.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Spelling.release.xcconfig"; sourceTree = "<group>"; };
 		6406D347F5B7E18CF968F77629C4F06E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		68A373F35F6B3CEBBEDB2B73A8EF20F8 /* Pods_Spelling.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_Spelling.framework; path = "Pods-Spelling.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		68A373F35F6B3CEBBEDB2B73A8EF20F8 /* Pods_Spelling.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Spelling.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		803409E41488076EE262CEF10866A064 /* BuyMeACoffee.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = BuyMeACoffee.debug.xcconfig; sourceTree = "<group>"; };
-		81DB90729DB0F62E7B8FF0945E552462 /* Lato-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Lato-Regular.ttf"; path = "Sources/BuyMeACoffee/Resources/Lato-Regular.ttf"; sourceTree = "<group>"; };
+		81DB90729DB0F62E7B8FF0945E552462 /* Lato-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Lato-Regular.ttf"; path = "Sources/BuyMeACoffee/Resources/Lato-Regular.ttf"; sourceTree = "<group>"; };
 		83DF1C46D54930F189B8E33B42574C0A /* BMCColor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BMCColor.swift; path = Sources/BuyMeACoffee/BMCColor.swift; sourceTree = "<group>"; };
 		905CFDF834DB4AE03495492B3DE6F04C /* BMCButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BMCButton.swift; path = Sources/BuyMeACoffee/BMCButton.swift; sourceTree = "<group>"; };
 		9A9D39AC4F8F7C6309683FE7E96EB826 /* BuyMeACoffee-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "BuyMeACoffee-Info.plist"; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		9FBAC58C5DD4411946DADC66E3EB812D /* Cookie-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Cookie-Regular.ttf"; path = "Sources/BuyMeACoffee/Resources/Cookie-Regular.ttf"; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9FBAC58C5DD4411946DADC66E3EB812D /* Cookie-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Cookie-Regular.ttf"; path = "Sources/BuyMeACoffee/Resources/Cookie-Regular.ttf"; sourceTree = "<group>"; };
 		A63DDA7956515292C9183664521DDE20 /* BuyMeACoffee.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = BuyMeACoffee.release.xcconfig; sourceTree = "<group>"; };
 		ADF352967E153C3F53B968CBD19B02E5 /* BuyMeACoffee-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "BuyMeACoffee-prefix.pch"; sourceTree = "<group>"; };
 		B5A594BA3CAC3E801931D87E36F55462 /* Pods-Spelling-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-Spelling-umbrella.h"; sourceTree = "<group>"; };
 		BD8608A2A28715E68F2180CC7043D968 /* Pods-Spelling-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-Spelling-frameworks.sh"; sourceTree = "<group>"; };
 		C7D315D7CF65A596A8021FF08134F4BE /* BuyMeACoffee-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "BuyMeACoffee-dummy.m"; sourceTree = "<group>"; };
-		C997FA64B8071B193EB3FAE46B4309E2 /* BuyMeACoffee.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = BuyMeACoffee.framework; path = BuyMeACoffee.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C997FA64B8071B193EB3FAE46B4309E2 /* BuyMeACoffee.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BuyMeACoffee.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CCC4D5012D5BEF1A48A86449B3BEF448 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Sources/BuyMeACoffee/Resources/Assets.xcassets; sourceTree = "<group>"; };
 		D0763CE07BBDEF2CF8B9A8DC2CE08B96 /* Pods-Spelling.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-Spelling.modulemap"; sourceTree = "<group>"; };
 		E014907170152B3F34A70C129D4275EE /* Pods-Spelling-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-Spelling-Info.plist"; sourceTree = "<group>"; };
@@ -109,7 +109,6 @@
 				4C62E86B2DE1D324BEF4BE08DCD905F0 /* Resources */,
 				E012E52AB1B0878738F53F1D5C328FA4 /* Support Files */,
 			);
-			name = BuyMeACoffee;
 			path = BuyMeACoffee;
 			sourceTree = "<group>";
 		};
@@ -267,7 +266,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1100;
-				LastUpgradeCheck = 1100;
+				LastUpgradeCheck = 1240;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 9.3";
@@ -358,7 +357,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/BuyMeACoffee/BuyMeACoffee-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/BuyMeACoffee/BuyMeACoffee-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -394,7 +393,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/BuyMeACoffee/BuyMeACoffee-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/BuyMeACoffee/BuyMeACoffee-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

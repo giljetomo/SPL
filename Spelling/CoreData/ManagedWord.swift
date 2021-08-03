@@ -10,8 +10,26 @@ import CoreData
 
 class ManagedWord: NSManagedObject {
   
+  private static let request: NSFetchRequest<ManagedWord> = ManagedWord.fetchRequest()
+  private static let notSpelledPredicate = NSPredicate(format: "status != 1")
+  private static var wordLengthPredicate: NSPredicate {
+    let level = Level(rawValue: AppSettings.level)!
+    let p = NSPredicate(format: "text MATCHES %@", ".{\(level.range.lowerBound),\(level.range.upperBound)}")
+    return p
+  }
+  
+  class func getCount(for level: Level, in context: NSManagedObjectContext) throws -> Int {
+    let levelPredicate = NSPredicate(format: "text MATCHES %@", ".{\(level.range.lowerBound),\(level.range.upperBound)}")
+    request.predicate = NSCompoundPredicate(type: .and, subpredicates: [notSpelledPredicate, levelPredicate])
+    do {
+      return try context.fetch(request).count
+    } catch {
+      print(error)
+    }
+    return 0
+  }
+  
   class func findWord(_ text: String, in context: NSManagedObjectContext) throws -> ManagedWord? {
-    let request: NSFetchRequest<ManagedWord> = ManagedWord.fetchRequest()
     let predicate = NSPredicate(format: "text LIKE[c] %@", text)
     request.predicate = predicate
     do {
@@ -31,18 +49,12 @@ class ManagedWord: NSManagedObject {
     return word
   }
   
-  class func fetchWord(with level: Level, in context: NSManagedObjectContext) throws -> ManagedWord? {
-    let lowerbound = level.range.lowerBound
-    let upperbound = level.range.upperBound
-    let request: NSFetchRequest<ManagedWord> = ManagedWord.fetchRequest()
-    let notSpelledPredicate = NSPredicate(format: "status != 1")
-    let textLengthPredicate = NSPredicate(format: "text MATCHES %@", ".{\(lowerbound),\(upperbound)}")
-    let andPredicates = NSCompoundPredicate(type: .and, subpredicates: [notSpelledPredicate, textLengthPredicate])
-    request.predicate = andPredicates
+  class func fetchWord(in context: NSManagedObjectContext) throws -> ManagedWord? {
+    request.predicate = NSCompoundPredicate(type: .and, subpredicates: [notSpelledPredicate, wordLengthPredicate])
     do {
       let words = try context.fetch(request)
       guard words.count > 1 else {
-        request.predicate = textLengthPredicate
+        request.predicate = wordLengthPredicate
         let words = try context.fetch(request)
         return getRandomWord(words)
       }
@@ -52,6 +64,18 @@ class ManagedWord: NSManagedObject {
       print(error)
       throw error
     }
+  }
+  
+  class func getPWord(in context: NSManagedObjectContext) throws -> ManagedWord? {
+    let predicate = NSPredicate(format: "text BEGINSWITH %@", "p")
+    request.predicate = NSCompoundPredicate(type: .and, subpredicates: [predicate, wordLengthPredicate])
+    do {
+      let words = try context.fetch(request)
+      return getRandomWord(words)
+    } catch {
+      print(error.localizedDescription)
+    }
+    return nil
   }
   
   class func preloadData(in context: NSManagedObjectContext) {

@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import CoreData
 
 class LevelMenuCollectionViewCell: UICollectionViewCell {
  
   static let reuseIdentifier = "LevelMenuCollectionViewCell"
+  var container: NSPersistentContainer? = AppDelegate.persistentContainer
   
   let label: UILabel = {
     let lbl = UILabel()
@@ -22,7 +24,16 @@ class LevelMenuCollectionViewCell: UICollectionViewCell {
   
   let subLabel: UILabel = {
     let lbl = UILabel()
-    lbl.font = .preferredFont(forTextStyle: .subheadline)
+    lbl.font = .preferredFont(forTextStyle: .body)
+    lbl.adjustsFontSizeToFitWidth = true
+    lbl.textAlignment = .center
+    lbl.textColor = Color.textColor
+    return lbl
+  }()
+  
+  let countLabel: UILabel = {
+    let lbl = UILabel()
+    lbl.font = .preferredFont(forTextStyle: .footnote)
     lbl.adjustsFontSizeToFitWidth = true
     lbl.textAlignment = .center
     lbl.textColor = Color.textColor
@@ -30,11 +41,12 @@ class LevelMenuCollectionViewCell: UICollectionViewCell {
   }()
   
   lazy var hStackView: UIStackView = {
-    let sv = UIStackView(arrangedSubviews: [label, subLabel])
+    let sv = UIStackView(arrangedSubviews: [label, subLabel, countLabel])
     sv.translatesAutoresizingMaskIntoConstraints = false
     sv.axis = .vertical
     sv.distribution = .fill
     sv.alignment = .center
+    sv.spacing = 2
     return sv
   }()
   
@@ -42,8 +54,8 @@ class LevelMenuCollectionViewCell: UICollectionViewCell {
     super.init(frame: frame)
     contentView.addSubview(hStackView)
     
-    hStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-    hStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+    hStackView.centerXYin(contentView)
+    
     contentView.backgroundColor = Color.screenColor
     contentView.layer.cornerRadius = 8
     contentView.layer.masksToBounds = false
@@ -54,6 +66,25 @@ class LevelMenuCollectionViewCell: UICollectionViewCell {
   }
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  func setup(with level: Level) {
+    let count: Int = {
+      switch level {
+      case .tourist: return AppSettings.touristSpellCount
+      case .immigrant: return AppSettings.immigrantSpellCount
+      case .citizen: return AppSettings.citizenSpellCount
+      case .president: return AppSettings.presidentSpellCount
+      }
+    }()
+    
+    label.text = level.rawValue.uppercased()
+    subLabel.text = "\(level.range.lowerBound) to \(level.range.upperBound) letters"
+    
+    let numberFormatter = NumberFormatter()
+    numberFormatter.numberStyle = .decimal
+    guard let value = numberFormatter.string(from: NSNumber(value: count)) else { return }
+    countLabel.text = "\(value) word\(count == 1 ? "" : "s") left"
   }
   
 }

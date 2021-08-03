@@ -12,7 +12,7 @@ enum Level: String, CaseIterable {
   case tourist //61,553
   case citizen //56,199
   case immigrant //58,055
-  case president //16,906
+  case president //16,919
   
   var range: CountableClosedRange<Int32> {
     switch self {

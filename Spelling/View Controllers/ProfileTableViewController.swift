@@ -87,19 +87,19 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
     tableView.sectionIndexColor = Color.textColor
     tableView.backgroundColor = Color.tableviewColor
     navigationItem.titleView = hStackView
-    navigationItem.searchController = searchController
     searchController.searchResultsUpdater = self
     searchController.obscuresBackgroundDuringPresentation = false
     tableView.register(WordTableViewCell.self, forCellReuseIdentifier: WordTableViewCell.reuseIdentifier)
     filterChanged(self.countSegmentedControl)
   }
-  
-  override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) { searchController.isActive = true }
+
+  override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {searchController.isActive = true }
   override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { searchController.isActive = false }
 
   fileprivate func setLabelCount() {
     do {
       guard let count = try? fetchedResultsController.managedObjectContext.count(for: request) else { return }
+      navigationItem.searchController = count > 20 ? searchController : nil
       let numberFormatter = NumberFormatter()
       numberFormatter.numberStyle = .decimal
       let value = numberFormatter.string(from: NSNumber(value: count))
@@ -107,7 +107,7 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
       guard let countsLabel = countLabel.text, countsLabel != value  else { return }
       
       UIView.transition(with: countLabel, duration: 0.5, options: .transitionFlipFromTop) { [weak self] in
-        self?.countLabel.text = value
+        self?.countLabel.text = count > 0 ? value : " "
         UIView.animate(withDuration: 0.5) {
           self?.countLabel.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
         } completion: { (_) in
@@ -120,6 +120,7 @@ class ProfileTableViewController: FetchedResultsTableViewController, UIGestureRe
   @objc func filterChanged(_ sender: UISegmentedControl) {
     guard let title = sender.titleForSegment(at: sender.selectedSegmentIndex) else { return }
     filter = Filter(rawValue: title.lowercased())!
+    
     do {
       fetchedResultsController.fetchRequest.predicate = predicate
       try fetchedResultsController.performFetch()

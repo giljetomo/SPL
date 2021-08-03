@@ -43,7 +43,6 @@ class SpeechService: NSObject {
     utterance.volume = volume
     utterance.rate = 0.4
     speechService.speak(utterance)
-    print(utterance.voice)
   }
   
   func setVolume(to level: Float) {

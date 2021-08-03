@@ -30,6 +30,8 @@ class LevelMenuLauncher: NSObject {
   let blackView = UIView()
   
   func showMenu() {
+    menuCollectionView.reloadData()
+    
     if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
       blackView.backgroundColor = UIColor(white: 0, alpha: 0.7)
       blackView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissView)))
@@ -107,8 +109,7 @@ extension LevelMenuLauncher: UICollectionViewDelegate, UICollectionViewDataSourc
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LevelMenuCollectionViewCell.reuseIdentifier, for: indexPath) as! LevelMenuCollectionViewCell
     
     let level = levels[indexPath.item]
-    cell.label.text = level.rawValue.uppercased()
-    cell.subLabel.text = "\(level.range.lowerBound) to \(level.range.upperBound) letters"
+    cell.setup(with: level)
     return cell
   }
   
