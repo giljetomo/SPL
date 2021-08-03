@@ -327,8 +327,8 @@ class MainViewController: UIViewController {
     guard let context = container?.viewContext else { return false }
     
     fetchedWord = AppSettings.word.isEmpty
-      ? try? ManagedWord.fetchWord(in: context)
-      : try? ManagedWord.findWord(AppSettings.word, in: context)
+                  ? try? ManagedWord.fetchWord(in: context)
+                  : try? ManagedWord.findWord(AppSettings.word, in: context)
     
     return fetchedWord != nil
   }
@@ -574,7 +574,7 @@ class MainViewController: UIViewController {
     
     levelView.addSubview(levelLabel)
     levelLabel.matchParent()
-    
+
     topView.addSubview(levelView)
     levelView.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -8).isActive = true
     levelView.centerYAnchor.constraint(equalTo: topView.centerYAnchor).isActive = true
@@ -593,7 +593,7 @@ class MainViewController: UIViewController {
     definitionView.addSubview(definitionCollectionView)
     definitionCollectionView.translatesAutoresizingMaskIntoConstraints = false
     definitionCollectionView.matchSize()
-    
+
     audioImageView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.07).isActive = true
     audioImageView.widthAnchor.constraint(equalTo: audioImageView.heightAnchor, multiplier: 1).isActive = true
     audioVStackView.topAnchor.constraint(equalTo: definitionCollectionView.bottomAnchor, constant: audioVStackViewTopAnchor).isActive = true
@@ -652,7 +652,7 @@ class MainViewController: UIViewController {
     
     infoLabelShadowView.trailingAnchor.constraint(equalTo: levelView.trailingAnchor).isActive = true
     infoLabelShadowView.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
-    
+
     
     infoLabelShadowView.addSubview(infoLabelView)
     infoLabelView.centerXYin(infoLabelShadowView)
@@ -952,21 +952,21 @@ class MainViewController: UIViewController {
       }
     }
   }
-  
+
   private func checkAnswer(completion: @escaping (_ completed: Bool) -> Void) {
     CATransaction.begin()
     CATransaction.setCompletionBlock { completion(true) }
     
     guard let text = fetchedWord?.text, let context = container?.viewContext else { return }
     let isCorrect = text == guessLabel.text
-    
+   
     //frc deletes the entry from the tableview if the state update is performed in the background thread.
     context.perform {
       let word = try? ManagedWord.findWord(text, in: context)
       word?.state = isCorrect ? .spelled : .misspelled
       try? context.save()
     }
-    
+
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [unowned self] in
       if isCorrect {
         UIView.transition(with: guessLabel, duration: 0.8, options: .transitionFlipFromTop) { [weak self] in

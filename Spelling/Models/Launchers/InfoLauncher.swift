@@ -30,7 +30,11 @@ class InfoLauncher: NSObject {
   lazy var textView: UITextView = {
     let tv = UITextView()
     tv.translatesAutoresizingMaskIntoConstraints = false
-    let text = "SPL works best with US-Tom (Enhanced) and UK-Daniel (Enhanced) voices installed from:\n\nSettings ＞ Accessibility ＞ Spoken Content ＞ Voices ＞ English"
+    let text = """
+              SPL works best with US-Tom (Enhanced) and UK-Daniel (Enhanced) voices installed from:\n
+              Settings ＞ Accessibility ＞ Spoken Content ＞ Voices ＞ English\n
+              Privacy Policy
+              """
     let attributedString = NSMutableAttributedString(string: text)
     
     let allTextRange = attributedString.mutableString.range(of: text)
@@ -63,7 +67,7 @@ class InfoLauncher: NSObject {
     tv.isEditable = false
     tv.attributedText = attributedString
     tv.backgroundColor = .clear
-    tv.textAlignment = .left
+    tv.textAlignment = .center
     return tv
   }()
   
