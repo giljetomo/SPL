@@ -1,38 +1,16 @@
-<h4 style="text-align: center;">Privacy Policy</h4>
+#### Privacy Policy
+The developer of SPL app value your privacy and will uphold the highest standards to protect it. By using SPL or by visiting my website, you acknowledge that you accept the practices and policies outlined in this Privacy Policy.
 
+SPL may contain links to other sites or products and we are not responsible for the privacy policies and/or practices of other companies. When linking to another company, you should read that company’s privacy policy.
 
-You can use the [editor on GitHub](https://github.com/giljetomo/SPL/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+#### Information Collection
+SPL does not log or share your personal information.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+**Cookies**
 
-### Markdown
+Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device's internal memory.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/giljetomo/SPL/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+SPL does not use these “cookies” explicitly. However, the app may use third party code and libraries that use “cookies” to collect information and improve their services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be able to use some portions of this app.
 
 ### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+If you have any questions or concerns regarding privacy, please send a message to .
