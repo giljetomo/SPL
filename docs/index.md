@@ -8,7 +8,7 @@ SPL may contain links to other sites or products and we are not responsible for 
 #### Information Collection
 SPL does not log or share your personal information.
 
-### Cookies
+#### Cookies
 Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are stored on your device's internal memory.
 
 SPL does not use “cookies” or use third party code and libraries that use “cookies” to collect information and improve its services.
@@ -16,5 +16,5 @@ SPL does not use “cookies” or use third party code and libraries that use �
 #### Changes to this Privacy Policy
 SPL may amend this Privacy Policy from time to time. If there are changes in the way the information is collected and used, this page will be updated. Users are bound by any changes to the Privacy Policy when he or she uses the product or website after such changes have been first posted.
 
-### Support or Contact
+#### Support or Contact
 If you have any questions or concerns regarding privacy, please send a message to gmjetomo@outlook.com.
