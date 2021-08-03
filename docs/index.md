@@ -1,4 +1,4 @@
-_Last Updated: August 3, 2021
+_Last Updated: August 3, 2021_
 
 #### Privacy Policy
 The developer of SPL app values your privacy and will uphold the highest standards to protect it. By using SPL or by visiting the developer's website, you acknowledge that you accept the practices and policies outlined in this Privacy Policy.
